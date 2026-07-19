@@ -1,0 +1,36 @@
+flowchart TD
+    subgraph PRIM ["1 · Palette primitive — _tokens.scss\n(jamais référencée dans les composants)"]
+        P1["$p-gray-900: #0f0f11"]
+        P2["$p-indigo-400: #818cf8"]
+        P3["$p-red-500: #ef4444"]
+    end
+
+    subgraph SEM ["2 · Tokens sémantiques — CSS custom properties"]
+        T1["--color-bg"]
+        T2["--color-accent"]
+        T3["--color-danger"]
+        T4["--color-text-primary\n--color-text-muted\n--shadow-sm · --shadow-md\n--transition-fast · ..."]
+    end
+
+    subgraph THEME ["3 · Theme switching — useTheme.ts"]
+        DARK["data-theme='dark'\n--color-bg: #0f0f11\n--color-accent: #fff\n(défaut)"]
+        LIGHT["data-theme='light'\n--color-bg: #f9f9fb\n--color-accent: #000"]
+    end
+
+    subgraph INJECT ["4 · Auto-injection — nuxt.config.ts"]
+        NC["vite.css.preprocessorOptions.scss\n  additionalData:\n  @use '~/assets/scss/tokens' as *\n→ disponible dans tout style lang=scss\nsans import explicite"]
+    end
+
+    subgraph COMP ["5 · Dans un composant Vue"]
+        CO[".card { background: var(--color-bg) }\n.label { color: var(--color-text-muted) }\n.btn   { color: var(--color-accent) }\n\n❌ jamais : color: $p-gray-900"]
+    end
+
+    P1 --> T1
+    P2 --> T2
+    P3 --> T3
+    SEM --> DARK
+    SEM --> LIGHT
+    SEM --> INJECT
+    INJECT --> COMP
+    DARK --> COMP
+    LIGHT --> COMP

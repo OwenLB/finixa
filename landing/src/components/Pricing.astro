@@ -1,0 +1,137 @@
+---
+import type { Translations } from '../i18n/translations';
+import Icon from './Icon.astro';
+
+interface Props {
+  t: Translations['pricing'];
+}
+
+const { t } = Astro.props;
+---
+
+<section class="section pricing" id="pricing">
+  <div class="container">
+    <div class="section-label">{t.sectionLabel}</div>
+
+    <h2 class="pricing-title reveal-up">
+      <span class="pencil-mark">{t.titleAccent}</span> {t.titleRest}
+    </h2>
+
+    <div class="pricing-center">
+      <div class="pricing-card reveal-up delay-1">
+
+        <div class="plan-header">
+          <div class="plan-name">{t.planName}</div>
+          <div class="plan-price">
+            <span class="price-amount">{t.priceAmount}</span>
+            <span class="price-period">{t.pricePeriod}</span>
+          </div>
+        </div>
+
+        <div class="data-joke">
+          <span class="joke-icon"><Icon name="eyeoff" size={18} /></span>
+          <p>
+            {t.jokeText}<br />
+            <em>{t.jokeItalic}</em>
+          </p>
+        </div>
+
+        <ul class="plan-features">
+          {t.features.map(f => (
+            <li class="feature-item">
+              <span class="feature-check">✓</span>
+              {f}
+            </li>
+          ))}
+        </ul>
+
+        <a href="https://app.finixa.net" class="btn-appstore pricing-btn" aria-label={t.cta} rel="noopener noreferrer" target="_blank">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 17L17 7M17 7H8M17 7v9"/>
+          </svg>
+          {t.cta}
+        </a>
+
+        <p class="plan-footnote">{t.footnote}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .pricing-title {
+    font-size: clamp(32px, 4vw, 52px);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+    margin-bottom: 48px;
+  }
+
+  .pricing-center { display: flex; justify-content: center; }
+
+  .pricing-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 40px 44px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    width: 100%;
+    max-width: 520px;
+  }
+
+  .plan-header { display: flex; flex-direction: column; gap: 10px; }
+
+  .plan-name {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .plan-price { display: flex; flex-direction: column; gap: 3px; }
+
+  .price-amount { font-size: 56px; font-weight: 800; letter-spacing: -0.04em; line-height: 1; color: var(--text); }
+  .price-period { font-size: 13px; color: var(--text-muted); }
+
+  .data-joke {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+  }
+
+  .joke-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+
+  .data-joke p { font-size: 13.5px; line-height: 1.6; color: var(--text-muted); }
+  .data-joke em { color: var(--text-subtle); font-style: italic; font-size: 12.5px; }
+
+  .plan-features { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+
+  .feature-item { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--text); }
+
+  .feature-check {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    flex-shrink: 0;
+    background: var(--surface-2);
+    color: var(--text-muted);
+  }
+
+  .pricing-btn { width: 100%; justify-content: center; font-size: 15px; padding: 15px 24px; }
+
+  .plan-footnote { font-size: 12px; color: var(--text-subtle); text-align: center; }
+
+  @media (max-width: 540px) { .pricing-card { padding: 28px 24px; } }
+</style>

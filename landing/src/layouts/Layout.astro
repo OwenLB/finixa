@@ -1,0 +1,124 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  ogImage?: string;
+  lang?: string;
+}
+
+const {
+  title       = 'Finixa — Application budget personnel iOS',
+  description = 'Gérez vos finances personnelles sur iPhone avec Finixa. Suivi des dépenses en 5 secondes, budget mensuel par catégorie. Sans connexion bancaire.',
+  ogImage     = '/og-image.png',
+  lang        = 'fr',
+} = Astro.props;
+
+const siteUrl      = 'https://finixa.app';
+const canonicalURL = lang === 'fr' ? `${siteUrl}/` : `${siteUrl}/en/`;
+const ogImageURL   = ogImage.startsWith('http') ? ogImage : `${siteUrl}${ogImage}`;
+const ogLocale     = lang === 'fr' ? 'fr_FR' : 'en_US';
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+
+    <!-- SEO essentials -->
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href={canonicalURL} />
+
+    <!-- Hreflang (i18n) -->
+    <link rel="alternate" hreflang="fr"        href={`${siteUrl}/`} />
+    <link rel="alternate" hreflang="en"        href={`${siteUrl}/en/`} />
+    <link rel="alternate" hreflang="x-default" href={`${siteUrl}/`} />
+
+    <!-- Anti-FOUC : light par défaut, dark optionnel — applique le thème avant le premier rendu -->
+    <script is:inline>
+      (function () {
+        const stored = localStorage.getItem('theme');
+        if (stored === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+      })();
+    </script>
+
+    <!-- Open Graph -->
+    <meta property="og:type"        content="website" />
+    <meta property="og:site_name"   content="Finixa" />
+    <meta property="og:title"       content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image"       content={ogImageURL} />
+    <meta property="og:image:width"  content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt"   content="Finixa — Application budget personnel iOS" />
+    <meta property="og:url"         content={canonicalURL} />
+    <meta property="og:locale"      content={ogLocale} />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card"        content="summary_large_image" />
+    <meta name="twitter:title"       content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image"       content={ogImageURL} />
+    <meta name="twitter:image:alt"   content="Finixa — Application budget personnel iOS" />
+
+    <!-- Structured Data: WebApplication -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Finixa",
+        "description": "Application web de gestion finances personnelles et suivi budget mensuel. Ajout de dépenses en 5 secondes, catégories personnalisables, sans connexion bancaire.",
+        "applicationCategory": "FinanceApplication",
+        "browserRequirements": "Requires a modern web browser",
+        "inLanguage": ["fr", "en"],
+        "url": "https://app.finixa.net",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "EUR"
+        },
+        "author": {
+          "@type": "Person",
+          "name": "Owen",
+          "url": "https://finixa.app/#createur"
+        }
+      }
+    </script>
+
+    <!-- Police unique : DM Sans (grotesque neutre, du light au bold) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" />
+  </head>
+  <body>
+    <slot />
+
+    <!-- Scroll-triggered reveal -->
+    <script>
+      const revealEls = document.querySelectorAll('.reveal-up, .reveal-fade');
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              (entry.target as HTMLElement).style.animationPlayState = 'running';
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.15 }
+      );
+
+      revealEls.forEach((el) => {
+        (el as HTMLElement).style.animationPlayState = 'paused';
+        observer.observe(el);
+      });
+    </script>
+  </body>
+</html>

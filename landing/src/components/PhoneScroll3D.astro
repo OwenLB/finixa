@@ -1,0 +1,276 @@
+---
+// Section scroll-scrubbée : légendes + points de progression.
+// La maquette 3D (unique) est rendue et animée par PhoneStage3D, qui se cale
+// sur l'ancre #pscroll-stage ci-dessous et y joue le morph des écrans.
+import Icon from './Icon.astro';
+interface Step { eyebrow: string; title: string; sub: string; }
+interface Intro { eyebrow: string; title: string; sub: string; }
+interface Card { ic: string; name: string; amt: string; }
+interface Props { steps?: Step[]; intro?: Intro; cards?: Card[]; }
+
+// Positions de dispersion des cartes (toutes biaisées vers la droite du téléphone)
+const POSITIONS = [
+  [250, -280], [470, -210], [320, -110], [520, -80], [380, 30], [560, 55],
+  [320, 165], [540, 185], [360, 295], [560, 270], [280, 335], [460, 345],
+];
+
+const {
+  steps = [
+    { eyebrow: '01 — Saisir',     title: 'Ajoute une dépense<br />en 5 secondes.', sub: 'Montant en grand, clavier immédiat. Même à la caisse.' },
+    { eyebrow: '02 — Ranger',     title: 'Tout se range,<br />tout seul.',          sub: 'Catégorisé, pointé, sous contrôle — sans effort.' },
+    { eyebrow: '03 — Comprendre', title: "Et tu vois tout,<br />d'un coup d'œil.",  sub: 'Budget par catégorie, 50/30/20, au centime.' },
+  ],
+  intro = {
+    eyebrow: '00 — Éparpillé',
+    title: 'Tes dépenses,<br />partout.',
+    sub: 'Finixa les capture et remet tout en ordre.',
+  },
+  cards = [
+    { ic: 'utensils',     name: 'Restaurant',  amt: '-12,90 €' },
+    { ic: 'dumbbell',     name: 'Sport',       amt: '-29,90 €' },
+    { ic: 'cart',         name: 'Courses',     amt: '-32,40 €' },
+    { ic: 'smartphone',   name: 'Abonnement',  amt: '-9,99 €' },
+    { ic: 'clapperboard', name: 'Cinéma',      amt: '-11,00 €' },
+    { ic: 'package',      name: 'Amazon',      amt: '-24,90 €' },
+    { ic: 'pill',         name: 'Pharmacie',   amt: '-8,40 €' },
+    { ic: 'zap',          name: 'Énergie',     amt: '-56,00 €' },
+    { ic: 'train',        name: 'Transport',   amt: '-2,10 €' },
+    { ic: 'home',         name: 'Loyer',       amt: '-710 €' },
+    { ic: 'coffee',       name: 'Café',        amt: '-3,50 €' },
+    { ic: 'fuel',         name: 'Essence',     amt: '-45,00 €' },
+  ],
+} = Astro.props;
+---
+
+<section class="pscroll" id="pscroll">
+  <div class="pscroll-sticky">
+    <span class="watermark pscroll-watermark" aria-hidden="true">Finixa</span>
+
+    <div class="pscroll-stage" id="pscroll-stage" aria-hidden="true"></div>
+
+    <div class="pscroll-intro" id="pscroll-intro" aria-hidden="true">
+      <div class="pcap-eyebrow">{intro.eyebrow}</div>
+      <h2 class="pcap-title" set:html={intro.title} />
+      <p class="pcap-sub">{intro.sub}</p>
+    </div>
+
+    <div class="pscroll-captions" aria-hidden="true">
+      {steps.map((s, i) => (
+        <div class="pcap" data-step={i}>
+          <div class="pcap-eyebrow">{s.eyebrow}</div>
+          <h2 class="pcap-title" set:html={s.title} />
+          <p class="pcap-sub">{s.sub}</p>
+        </div>
+      ))}
+    </div>
+
+    <div class="pscroll-progress" aria-hidden="true">
+      <span class="pp-dot" data-d="0"></span>
+      <span class="pp-dot" data-d="1"></span>
+      <span class="pp-dot" data-d="2"></span>
+    </div>
+
+    <!-- Cartes éparpillées : DANS le sticky -> défilent avec la page (pas de pop), sous la maquette -->
+    <div class="pscroll-cards" id="pscroll-cards" aria-hidden="true">
+      {cards.map((c, i) => (
+        <div
+          class="ptx"
+          data-x={POSITIONS[i % POSITIONS.length][0]}
+          data-y={POSITIONS[i % POSITIONS.length][1]}
+          style={`transform: translate(-50%,-50%) translate(${POSITIONS[i % POSITIONS.length][0]}px, ${POSITIONS[i % POSITIONS.length][1]}px)`}
+        >
+          <span class="ptx-ic" data-cat={c.ic}><Icon name={c.ic} size={15} /></span><span class="ptx-name">{c.name}</span><span class="ptx-amt">{c.amt}</span>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .pscroll {
+    position: relative;
+    height: 280vh;
+    background: var(--bg);
+  }
+
+  .pscroll-sticky {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .pscroll-watermark { top: 44%; }
+
+  .pscroll-stage {
+    position: relative;
+    z-index: 2;
+    height: clamp(420px, 70vh, 700px);
+    aspect-ratio: 360 / 720;
+    transform: translateX(22%);
+  }
+
+  /* Légendes : colonne à gauche, centrée verticalement */
+  .pscroll-captions {
+    position: absolute;
+    left: clamp(28px, 7vw, 96px);
+    top: 50%;
+    transform: translateY(-50%);
+    width: min(430px, 40vw);
+    height: 220px;
+    z-index: 3;
+    text-align: left;
+    pointer-events: none;
+  }
+
+  .pcap {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 100%;
+    transform: translateY(calc(-50% + var(--cap-shift, 0px)));
+    opacity: 0;
+    will-change: opacity, transform;
+  }
+
+  .pcap-eyebrow {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+  }
+
+  .pcap-title {
+    font-family: var(--font-display);
+    font-size: clamp(28px, 3.6vw, 50px);
+    font-weight: 500;
+    letter-spacing: -0.04em;
+    line-height: 1.04;
+    color: var(--text);
+    margin-bottom: 16px;
+  }
+
+  .pcap-sub {
+    font-size: clamp(14px, 1.4vw, 17px);
+    color: var(--text-muted);
+    line-height: 1.5;
+    max-width: 24em;
+  }
+
+  /* Progress dots */
+  .pscroll-progress {
+    position: absolute;
+    top: 50%;
+    right: clamp(20px, 4vw, 56px);
+    transform: translateY(-50%);
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .pp-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: color-mix(in srgb, var(--text) 22%, transparent);
+    transition: background 0.3s, transform 0.3s;
+  }
+  .pp-dot.on { background: var(--text); transform: scale(1.45); }
+
+  @media (max-width: 900px) {
+    .pscroll-stage { transform: translateX(0); height: clamp(360px, 50vh, 520px); }
+    .pscroll-captions {
+      left: 0; right: 0;
+      top: auto; bottom: clamp(28px, 6vh, 64px);
+      transform: none;
+      width: auto; height: auto; min-height: 150px;
+      text-align: center;
+    }
+    .pcap { top: auto; bottom: 0; transform: translateY(var(--cap-shift, 0px)); }
+    .pcap-sub { max-width: none; }
+    .pscroll-progress { display: none; }
+  }
+
+  @media (max-width: 700px) {
+    .pscroll { height: 250vh; }
+  }
+
+  /* Étape 0 : cartes transactions éparpillées — dans le sticky, sous la maquette (canvas z-index:1) */
+  .pscroll-cards {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+  .ptx {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.12);
+    font-size: 13px;
+    white-space: nowrap;
+    opacity: 1;
+    transform: translate(-50%, -50%);
+    will-change: transform, opacity;
+  }
+  .ptx-ic {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+    color: var(--text);
+    background: color-mix(in srgb, currentColor 14%, var(--surface-2));
+    flex-shrink: 0;
+  }
+  /* Couleurs par catégorie (un peu de couleur sur les icônes) */
+  .ptx-ic[data-cat="utensils"]     { color: var(--orange); }
+  .ptx-ic[data-cat="dumbbell"]     { color: var(--green); }
+  .ptx-ic[data-cat="cart"]         { color: var(--orange); }
+  .ptx-ic[data-cat="smartphone"]   { color: var(--blue); }
+  .ptx-ic[data-cat="clapperboard"] { color: var(--purple); }
+  .ptx-ic[data-cat="package"]      { color: var(--orange); }
+  .ptx-ic[data-cat="pill"]         { color: var(--red); }
+  .ptx-ic[data-cat="zap"]          { color: var(--orange); }
+  .ptx-ic[data-cat="train"]        { color: var(--blue); }
+  .ptx-ic[data-cat="home"]         { color: var(--blue); }
+  .ptx-ic[data-cat="coffee"]       { color: var(--orange); }
+  .ptx-ic[data-cat="fuel"]         { color: var(--red); }
+  .ptx-name { font-weight: 600; color: var(--text); }
+  .ptx-amt { color: var(--text-muted); font-variant-numeric: tabular-nums; }
+
+  /* Légende d'intro (étape 0) : colonne de gauche, comme les autres étapes */
+  .pscroll-intro {
+    position: absolute;
+    left: clamp(28px, 7vw, 96px);
+    top: 50%;
+    transform: translateY(-50%);
+    width: min(430px, 40vw);
+    z-index: 3;
+    text-align: left;
+    pointer-events: none;
+    opacity: 0;
+  }
+
+  @media (max-width: 900px) {
+    .pscroll-intro {
+      left: 0; right: 0;
+      top: auto; bottom: clamp(28px, 6vh, 64px);
+      transform: none;
+      width: auto;
+      text-align: center;
+    }
+    .ptx { font-size: 11px; padding: 8px 11px; }
+  }
+</style>

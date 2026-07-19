@@ -1,0 +1,18 @@
+sequenceDiagram
+    participant U as Utilisateur
+    participant Store as useCategoryStore
+    participant Svc as categoryService
+    participant DB as PostgreSQL
+
+    Note over DB: {id:1, budget:100, valid_from:2026-01-01, valid_to:null}
+
+    U->>Store: updateSubcategory({ budget: 150 })
+    Store->>Svc: updateSubcategory(1, { budget: 150 })
+    Svc->>DB: UPDATE SET valid_to = 2026-04-30 WHERE id = 1
+    Svc->>DB: INSERT {budget:150, valid_from:2026-05-01, valid_to:null}
+
+    Note over DB: {id:1, budget:100, valid_from:2026-01, valid_to:2026-04}
+    Note over DB: {id:2, budget:150, valid_from:2026-05, valid_to:null}
+
+    Note right of DB: Stats Janvier → id:1 → 100€
+    Note right of DB: Stats Mai    → id:2 → 150€

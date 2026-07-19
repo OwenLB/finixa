@@ -1,0 +1,130 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # nuxt prepare (postinstall) génère .nuxt/ requis par typecheck et lint
+      - name: Prepare Nuxt
+        run: npx nuxt prepare
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npm run test
+
+      - name: Build
+        run: npm run build
+        env:
+          SUPABASE_URL: https://example.supabase.co
+          SUPABASE_KEY: sb_publishable_ci_placeholder
+
+  # Tests base de données (RLS & RPC) via pgTAP, sur une stack Supabase locale.
+  # Job séparé : il démarre Docker (~1-2 min) et ne ralentit pas le job `quality`.
+  db:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Version épinglée : `latest` déclenche une résolution d'API GitHub qui
+      # renvoyait « Gateway Time-out » de façon répétée. Un numéro fixe télécharge
+      # directement l'asset de release (sans appel « resolve latest »).
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.106.0
+
+      - name: Start local database (applique les migrations)
+        run: supabase db start
+
+      - name: Run pgTAP tests
+        run: supabase test db
+
+  # Tests des Edge Functions (Deno). Couvre la logique pure extraite des fonctions
+  # (ex. daily-digest/logic.ts) sans démarrer le runtime complet ni la prod.
+  functions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Deno tests (logique des Edge Functions)
+        run: deno test supabase/functions/
+
+  # Tests end-to-end (Playwright). Job séparé : démarre une stack Supabase locale
+  # (auth + REST + Postgres + seed), installe un navigateur, build l'app pointée
+  # sur le Supabase local puis joue les parcours (visiteur + authentifiés).
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      # Même version épinglée que le job `db` (évite la résolution `latest`).
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.106.0
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      # Stack complète (migrations appliquées, auth + REST + Postgres).
+      - name: Start Supabase (stack locale)
+        run: supabase start
+
+      # Récupère l'URL d'API et la clé anon réelles de la stack locale et les
+      # expose aux étapes suivantes (le build SPA les fige dans le bundle).
+      - name: Export Supabase env
+        run: |
+          eval "$(supabase status -o env)"
+          echo "SUPABASE_URL=$API_URL" >> "$GITHUB_ENV"
+          echo "SUPABASE_KEY=${ANON_KEY:-${PUBLISHABLE_KEY:-}}" >> "$GITHUB_ENV"
+
+      # Utilisateur de test connectable (API admin Auth) + données minimales.
+      - name: Seed E2E user and data
+        run: |
+          echo "Variables exposées par supabase status:"
+          supabase status -o env | sed -E 's/=.*/=<redacted>/'
+          set -a; eval "$(supabase status -o env)"; set +a
+          bash scripts/seed-e2e.sh
+
+      - name: Build
+        run: npm run build
+        env:
+          SUPABASE_URL: ${{ env.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ env.SUPABASE_KEY }}
+
+      - name: E2E tests
+        run: npm run test:e2e
+        env:
+          SUPABASE_URL: ${{ env.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ env.SUPABASE_KEY }}

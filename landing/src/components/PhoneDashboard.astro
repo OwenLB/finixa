@@ -1,0 +1,101 @@
+---
+import DashboardContent from './DashboardContent.astro';
+import type { Translations } from '../i18n/translations';
+
+interface Props {
+  t: Translations['mockup'];
+}
+
+const { t } = Astro.props;
+---
+
+<div class="pd-wrap">
+  <div class="pd-frame">
+    <div class="pd-island"></div>
+    <div class="pd-screens">
+      <DashboardContent id="pscreen-hero" t={t} />
+    </div>
+    <div class="pd-home-bar"></div>
+  </div>
+</div>
+
+<style>
+  .pd-wrap {
+    display: flex;
+    justify-content: center;
+    position: relative;
+  }
+
+  .pd-frame {
+    width: 300px;
+    height: 630px;
+    background: var(--ph-frame-bg);
+    border-radius: 46px;
+    border: 1px solid var(--ph-frame-border);
+    position: relative;
+    overflow: hidden;
+    box-shadow:
+      0 0 0 6px var(--ph-frame-ring),
+      0 0 0 7px var(--ph-frame-border),
+      0 40px 80px rgba(0,0,0,0.5);
+    animation: pd-float 6s ease-in-out infinite;
+  }
+
+  @keyframes pd-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+  }
+
+  @media (min-width: 900px) {
+    .pd-frame {
+      width: 340px;
+      height: 715px;
+      border-radius: 52px;
+    }
+
+    .pd-screens {
+      border-radius: 52px;
+    }
+
+    .pd-island {
+      width: 100px;
+      height: 29px;
+      border-radius: 16px;
+    }
+
+    .pd-home-bar {
+      width: 114px;
+    }
+  }
+
+  .pd-island {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 88px;
+    height: 26px;
+    background: var(--ph-island-bg);
+    border-radius: 14px;
+    z-index: 30;
+  }
+
+  .pd-screens {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    border-radius: 46px;
+  }
+
+  .pd-home-bar {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 4px;
+    background: var(--ph-home-bar);
+    border-radius: 2px;
+    z-index: 30;
+  }
+</style>

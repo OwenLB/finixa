@@ -1,0 +1,177 @@
+---
+import { fr as t } from '../i18n/translations';
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+
+const lastUpdated = '28 mars 2026';
+---
+
+<Layout
+  lang="fr"
+  title="Politique de confidentialité — Finixa"
+  description="Politique de confidentialité de Finixa. Comment nous collectons, utilisons et protégeons vos données personnelles."
+>
+  <Navbar t={t.nav} />
+  <main class="legal-main">
+    <div class="container legal-container">
+
+      <div class="legal-header">
+        <a href="/" class="legal-back">← Retour</a>
+        <div class="section-label">Légal</div>
+        <h1 class="legal-title">Politique de confidentialité</h1>
+        <p class="legal-updated">Dernière mise à jour : {lastUpdated}</p>
+      </div>
+
+      <div class="legal-body">
+
+        <section class="legal-section">
+          <h2>1. Qui sommes-nous ?</h2>
+          <p>Finixa est une application web de gestion de budget personnel, développée et maintenue par Owen Lebec. Pour toute question relative à vos données, vous pouvez nous contacter à : <a href="mailto:contact@finixa.app">contact@finixa.app</a>.</p>
+        </section>
+
+        <section class="legal-section">
+          <h2>2. Données collectées</h2>
+          <p>Finixa collecte uniquement les données que vous saisissez volontairement :</p>
+          <ul>
+            <li><strong>Transactions financières</strong> — montants, catégories, libellés et dates que vous renseignez manuellement.</li>
+            <li><strong>Paramètres de l'application</strong> — préférences de thème, catégories personnalisées, cagnottes et budgets définis.</li>
+            <li><strong>Données de connexion</strong> — adresse e-mail et mot de passe si vous créez un compte (stockés de manière sécurisée via Supabase).</li>
+          </ul>
+          <p>Finixa <strong>ne se connecte jamais à votre banque</strong> et ne collecte aucun identifiant bancaire.</p>
+        </section>
+
+        <section class="legal-section">
+          <h2>3. Finalité du traitement</h2>
+          <p>Vos données sont utilisées exclusivement pour :</p>
+          <ul>
+            <li>Faire fonctionner l'application et afficher votre tableau de bord personnel.</li>
+            <li>Synchroniser vos données entre vos appareils si vous êtes connecté à un compte.</li>
+            <li>Améliorer l'expérience utilisateur (analyses agrégées et anonymisées uniquement).</li>
+          </ul>
+          <p>Vos données ne sont <strong>jamais vendues</strong> à des tiers, ni utilisées à des fins publicitaires.</p>
+        </section>
+
+        <section class="legal-section">
+          <h2>4. Hébergement et sécurité</h2>
+          <p>Les données sont hébergées sur <strong>Supabase</strong> (infrastructure PostgreSQL sur AWS), avec chiffrement en transit (TLS) et au repos. Supabase est conforme aux standards de sécurité en vigueur.</p>
+        </section>
+
+        <section class="legal-section">
+          <h2>5. Durée de conservation</h2>
+          <p>Vos données sont conservées aussi longtemps que votre compte est actif. En cas de suppression de compte, toutes vos données sont effacées dans un délai de 30 jours.</p>
+        </section>
+
+        <section class="legal-section">
+          <h2>6. Vos droits (RGPD)</h2>
+          <p>Conformément au Règlement Général sur la Protection des Données, vous disposez des droits suivants :</p>
+          <ul>
+            <li><strong>Droit d'accès</strong> — obtenir une copie de vos données.</li>
+            <li><strong>Droit de rectification</strong> — corriger des données inexactes.</li>
+            <li><strong>Droit à l'effacement</strong> — supprimer vos données ("droit à l'oubli").</li>
+            <li><strong>Droit à la portabilité</strong> — exporter vos données (format CSV disponible dans l'app).</li>
+            <li><strong>Droit d'opposition</strong> — vous opposer à certains traitements.</li>
+          </ul>
+          <p>Pour exercer ces droits, contactez-nous à <a href="mailto:contact@finixa.app">contact@finixa.app</a>.</p>
+        </section>
+
+        <section class="legal-section">
+          <h2>7. Cookies</h2>
+          <p>Finixa utilise uniquement des cookies techniques strictement nécessaires au fonctionnement de l'application (session utilisateur, préférence de thème). Aucun cookie de suivi ou publicitaire n'est utilisé.</p>
+        </section>
+
+        <section class="legal-section">
+          <h2>8. Modifications</h2>
+          <p>Nous nous réservons le droit de modifier cette politique à tout moment. En cas de changement significatif, vous en serez informé via l'application. La date de dernière mise à jour est indiquée en haut de cette page.</p>
+        </section>
+
+        <section class="legal-section">
+          <h2>9. Contact</h2>
+          <p>Pour toute question relative à cette politique ou à vos données personnelles : <a href="mailto:contact@finixa.app">contact@finixa.app</a></p>
+        </section>
+
+      </div>
+    </div>
+  </main>
+  <Footer t={t.footer} />
+</Layout>
+
+<style>
+  .legal-main {
+    padding-top: 120px;
+    padding-bottom: 80px;
+    min-height: 100vh;
+  }
+
+  .legal-container {
+    max-width: 720px;
+  }
+
+  .legal-header {
+    margin-bottom: 56px;
+  }
+
+  .legal-back {
+    display: inline-flex;
+    align-items: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+    transition: color var(--transition);
+  }
+  .legal-back:hover { color: var(--text); }
+
+  .legal-title {
+    font-size: clamp(32px, 5vw, 48px);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+    color: var(--text);
+    margin: 12px 0 8px;
+  }
+
+  .legal-updated {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .legal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  .legal-section h2 {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    margin-bottom: 12px;
+  }
+
+  .legal-section p,
+  .legal-section li {
+    font-size: 15px;
+    line-height: 1.75;
+    color: var(--text-muted);
+  }
+
+  .legal-section p + p { margin-top: 10px; }
+
+  .legal-section ul {
+    padding-left: 20px;
+    margin: 10px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .legal-section a {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .legal-section strong { color: var(--text); font-weight: 600; }
+</style>

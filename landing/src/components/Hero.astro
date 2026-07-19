@@ -1,0 +1,234 @@
+---
+import type { Translations } from '../i18n/translations';
+
+interface Props {
+  t: Translations['hero'];
+  mockup: Translations['mockup'];
+}
+
+const { t } = Astro.props;
+---
+
+<section class="hero" id="hero">
+  <div class="hero-aura" aria-hidden="true"></div>
+  <span class="watermark hero-watermark" aria-hidden="true">Finixa</span>
+
+  <div class="container hero-inner">
+    <div class="hero-copy">
+      <div class="hero-eyebrow">{t.badge}</div>
+
+      <h1 class="hero-title">
+        <span class="line line-1">{t.titleLine1}</span>
+        <span class="line line-2">{t.titleLine2} <span class="muted">{t.titleLine3}</span></span>
+      </h1>
+
+      <p class="hero-subtitle">
+        {t.subtitle} <span class="hero-sub-accent">{t.subAccent}</span>
+      </p>
+
+      <div class="hero-actions">
+        <a href="https://app.finixa.net" class="btn-appstore hero-btn" aria-label={t.cta} rel="noopener noreferrer" target="_blank">
+          {t.cta}
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 17L17 7M17 7H8M17 7v9"/>
+          </svg>
+        </a>
+
+        <div class="hero-social-proof">
+          <div class="avatars">
+            <img class="avatar" src="https://i.pravatar.cc/80?img=5" alt="" loading="lazy" width="30" height="30" />
+            <img class="avatar" src="https://i.pravatar.cc/80?img=12" alt="" loading="lazy" width="30" height="30" />
+            <img class="avatar" src="https://i.pravatar.cc/80?img=32" alt="" loading="lazy" width="30" height="30" />
+            <img class="avatar" src="https://i.pravatar.cc/80?img=68" alt="" loading="lazy" width="30" height="30" />
+          </div>
+          <span class="proof-text">{t.socialProof}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ancre : la maquette 3D (unique) est positionnée ici par PhoneStage3D -->
+    <div class="hero-stage" id="phone-anchor-hero" aria-hidden="true"></div>
+  </div>
+
+  <div class="hero-scroll-hint" aria-hidden="true">
+    <div class="scroll-line"></div>
+    <span>Scroll</span>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 140px 0 100px;
+    overflow: hidden;
+  }
+
+  /* Halo très doux derrière le téléphone */
+  .hero-aura {
+    position: absolute;
+    top: 50%;
+    left: 72%;
+    width: min(720px, 70vw);
+    height: 620px;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(ellipse at center, var(--accent-glow) 0%, transparent 65%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .hero-watermark {
+    top: 42%;
+  }
+
+  .hero-inner {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    align-items: center;
+    gap: clamp(32px, 5vw, 80px);
+  }
+
+  .hero-copy {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .hero-eyebrow {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 28px;
+    animation: heroFadeUp 0.7s var(--ease-spring) 0.05s both;
+  }
+
+  /* ── Ancre maquette 3D (le rendu vient de PhoneStage3D) ── */
+  .hero-stage {
+    width: 100%;
+    height: clamp(440px, 68vh, 700px);
+  }
+
+  /* ── Titre — typo légère façon Airform ── */
+  .hero-title {
+    font-size: clamp(38px, 5.2vw, 82px);
+    font-weight: 500;
+    letter-spacing: -0.04em;
+    line-height: 0.98;
+    margin-bottom: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .line-1 { animation: heroFadeUp 0.8s var(--ease-spring) 0.30s both; }
+  .line-2 { animation: heroFadeUp 0.8s var(--ease-spring) 0.40s both; }
+
+  .hero-title .muted { color: var(--text-subtle); }
+
+  .hero-subtitle {
+    font-size: clamp(15px, 1.4vw, 18px);
+    line-height: 1.6;
+    color: var(--text-muted);
+    max-width: 540px;
+    margin-bottom: 44px;
+    animation: heroFadeUp 0.8s var(--ease-spring) 0.5s both;
+  }
+
+  .hero-sub-accent { color: var(--text); }
+
+  .hero-actions {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    animation: heroFadeUp 0.8s var(--ease-spring) 0.6s both;
+  }
+
+  .hero-btn {
+    font-size: 15px;
+    padding: 15px 30px;
+  }
+
+  .hero-social-proof {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .avatars { display: flex; }
+
+  .avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid var(--bg);
+    background: var(--surface-2);
+    object-fit: cover;
+    margin-left: -8px;
+  }
+  .avatar:first-child { margin-left: 0; }
+
+  .proof-text { font-size: 13px; color: var(--text-muted); }
+
+  /* Scroll hint */
+  .hero-scroll-hint {
+    position: absolute;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-subtle);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    z-index: 2;
+    animation: heroFadeUp 0.6s ease-out 1s both;
+  }
+
+  .scroll-line {
+    width: 1px;
+    height: 42px;
+    background: linear-gradient(to bottom, transparent, var(--text-subtle));
+    animation: scrollAnim 2.2s ease-in-out infinite;
+  }
+
+  @keyframes scrollAnim {
+    0% { transform: scaleY(0); transform-origin: top; }
+    50% { transform: scaleY(1); transform-origin: top; }
+    51% { transform: scaleY(1); transform-origin: bottom; }
+    100% { transform: scaleY(0); transform-origin: bottom; }
+  }
+
+  /* Empilé et centré sous ~960px */
+  @media (max-width: 960px) {
+    .hero-inner {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+    .hero-copy {
+      align-items: center;
+      text-align: center;
+      order: 2;
+    }
+    .hero-stage { order: 1; }
+    .hero-actions { justify-content: center; }
+    .hero-aura { top: 38%; left: 50%; }
+  }
+
+  @media (max-width: 600px) {
+    .hero { padding: 120px 0 80px; }
+    .hero-scroll-hint { display: none; }
+  }
+</style>

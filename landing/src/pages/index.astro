@@ -1,0 +1,35 @@
+---
+import { fr as t } from '../i18n/translations';
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import Hero from '../components/Hero.astro';
+import PhoneStage3D from '../components/PhoneStage3D.astro';
+import PhoneScroll3D from '../components/PhoneScroll3D.astro';
+import CTAMid from '../components/CTAMid.astro';
+import ProblemSolution from '../components/ProblemSolution.astro';
+import BentoGrid from '../components/BentoGrid.astro';
+import Testimonials from '../components/Testimonials.astro';
+import Pricing from '../components/Pricing.astro';
+import Creator from '../components/Creator.astro';
+import FAQ from '../components/FAQ.astro';
+import Contribute from '../components/Contribute.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout lang={t.meta.lang} title={t.meta.title} description={t.meta.description}>
+  <Navbar t={t.nav} />
+  <PhoneStage3D />
+  <main>
+    <Hero t={t.hero} mockup={t.mockup} />
+    <PhoneScroll3D />
+    <CTAMid t={t.ctaMid} />
+    <ProblemSolution t={t.problemSolution} />
+    <BentoGrid t={t.bento} />
+    <Testimonials t={t.testimonials} />
+    <Pricing t={t.pricing} />
+    <Creator t={t.creator} />
+    <FAQ t={t.faq} />
+    <Contribute t={t.contribute} />
+  </main>
+  <Footer t={t.footer} />
+</Layout>

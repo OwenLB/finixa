@@ -1,0 +1,182 @@
+---
+import { fr as t } from '../i18n/translations';
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+
+const lastUpdated = '28 mars 2026';
+---
+
+<Layout
+  lang="fr"
+  title="Conditions d'utilisation — Finixa"
+  description="Conditions d'utilisation de Finixa. Règles d'usage de l'application de gestion de budget personnel."
+>
+  <Navbar t={t.nav} />
+  <main class="legal-main">
+    <div class="container legal-container">
+
+      <div class="legal-header">
+        <a href="/" class="legal-back">← Retour</a>
+        <div class="section-label">Légal</div>
+        <h1 class="legal-title">Conditions d'utilisation</h1>
+        <p class="legal-updated">Dernière mise à jour : {lastUpdated}</p>
+      </div>
+
+      <div class="legal-body">
+
+        <section class="legal-section">
+          <h2>1. Acceptation des conditions</h2>
+          <p>En accédant à Finixa ou en utilisant l'application, vous acceptez les présentes conditions d'utilisation dans leur intégralité. Si vous n'acceptez pas ces conditions, vous ne devez pas utiliser l'application.</p>
+        </section>
+
+        <section class="legal-section">
+          <h2>2. Description du service</h2>
+          <p>Finixa est une application web de gestion de budget personnel permettant de :</p>
+          <ul>
+            <li>Saisir et suivre des transactions financières manuellement.</li>
+            <li>Organiser les dépenses par catégories personnalisables.</li>
+            <li>Visualiser des graphiques et des indicateurs budgétaires.</li>
+            <li>Gérer des cagnottes et des objectifs d'épargne.</li>
+            <li>Importer des relevés bancaires au format CSV.</li>
+          </ul>
+          <p>Finixa ne constitue pas un service financier réglementé et ne fournit aucun conseil financier.</p>
+        </section>
+
+        <section class="legal-section">
+          <h2>3. Utilisation autorisée</h2>
+          <p>Vous vous engagez à utiliser Finixa uniquement à des fins personnelles et licites. Sont notamment interdits :</p>
+          <ul>
+            <li>Tout usage commercial sans autorisation préalable écrite.</li>
+            <li>Toute tentative de reverse engineering, décompilation ou extraction du code source.</li>
+            <li>Toute action susceptible de porter atteinte à la sécurité ou à l'intégrité de l'application.</li>
+            <li>La création de comptes multiples dans le but de contourner des limitations.</li>
+          </ul>
+        </section>
+
+        <section class="legal-section">
+          <h2>4. Gratuité</h2>
+          <p>Finixa est entièrement gratuit, sans limitation de durée. Aucun plan payant n'est prévu — l'objectif est que l'application reste accessible à tout le monde.</p>
+        </section>
+
+        <section class="legal-section">
+          <h2>5. Disponibilité du service</h2>
+          <p>Finixa est fourni "tel quel", sans garantie de disponibilité continue. Des interruptions de service peuvent survenir pour des raisons de maintenance ou de force majeure. Nous nous efforçons de minimiser ces interruptions.</p>
+        </section>
+
+        <section class="legal-section">
+          <h2>6. Responsabilité des données</h2>
+          <p>Vous êtes seul responsable des données que vous saisissez dans l'application. Finixa n'effectue aucune vérification de l'exactitude des informations financières renseignées. L'application est un outil d'aide à la gestion personnelle, non un système comptable certifié.</p>
+        </section>
+
+        <section class="legal-section">
+          <h2>7. Limitation de responsabilité</h2>
+          <p>Dans les limites permises par la loi, Finixa et son développeur ne sauraient être tenus responsables de tout dommage direct ou indirect résultant de l'utilisation ou de l'impossibilité d'utiliser l'application, y compris la perte de données.</p>
+          <p>Nous recommandons d'exporter régulièrement vos données via la fonction d'export CSV disponible dans l'application.</p>
+        </section>
+
+        <section class="legal-section">
+          <h2>8. Propriété intellectuelle</h2>
+          <p>L'ensemble des éléments constituant Finixa (code, design, marque, contenu) est la propriété exclusive de son développeur. Toute reproduction, distribution ou utilisation non autorisée est interdite.</p>
+        </section>
+
+        <section class="legal-section">
+          <h2>9. Modification des conditions</h2>
+          <p>Ces conditions peuvent être mises à jour à tout moment. En continuant à utiliser l'application après modification, vous acceptez les nouvelles conditions. La date de mise à jour est indiquée en haut de cette page.</p>
+        </section>
+
+        <section class="legal-section">
+          <h2>10. Droit applicable</h2>
+          <p>Ces conditions sont régies par le droit français. Tout litige sera soumis à la juridiction compétente des tribunaux français.</p>
+        </section>
+
+        <section class="legal-section">
+          <h2>11. Contact</h2>
+          <p>Pour toute question relative aux présentes conditions : <a href="mailto:contact@finixa.app">contact@finixa.app</a></p>
+        </section>
+
+      </div>
+    </div>
+  </main>
+  <Footer t={t.footer} />
+</Layout>
+
+<style>
+  .legal-main {
+    padding-top: 120px;
+    padding-bottom: 80px;
+    min-height: 100vh;
+  }
+
+  .legal-container {
+    max-width: 720px;
+  }
+
+  .legal-header {
+    margin-bottom: 56px;
+  }
+
+  .legal-back {
+    display: inline-flex;
+    align-items: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+    transition: color var(--transition);
+  }
+  .legal-back:hover { color: var(--text); }
+
+  .legal-title {
+    font-size: clamp(32px, 5vw, 48px);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+    color: var(--text);
+    margin: 12px 0 8px;
+  }
+
+  .legal-updated {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .legal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  .legal-section h2 {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    margin-bottom: 12px;
+  }
+
+  .legal-section p,
+  .legal-section li {
+    font-size: 15px;
+    line-height: 1.75;
+    color: var(--text-muted);
+  }
+
+  .legal-section p + p { margin-top: 10px; }
+
+  .legal-section ul {
+    padding-left: 20px;
+    margin: 10px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .legal-section a {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .legal-section strong { color: var(--text); font-weight: 600; }
+</style>

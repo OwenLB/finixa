@@ -1,0 +1,20 @@
+sequenceDiagram
+    actor U as Utilisateur
+    participant AP as useAddPanel
+    participant Form as add.vue
+    participant Store as useTransactionStore
+    participant Svc as transactionService
+    participant SB as Supabase RLS
+
+    U->>AP: tap bouton "+"
+    AP->>Form: isOpen = true
+    Form-->>U: drawer animé depuis le bas
+    U->>Form: saisit montant, catégorie, date
+    Form->>Store: add(transactionForm)
+    Store->>Svc: insertTransaction(form, userId)
+    Svc->>SB: INSERT INTO transactions WHERE user_id = auth.uid()
+    SB-->>Svc: Transaction créée
+    Svc-->>Store: Transaction
+    Store->>Store: transactions.unshift(new)
+    Store-->>Form: loading = false
+    Form-->>U: drawer fermé + toast succès

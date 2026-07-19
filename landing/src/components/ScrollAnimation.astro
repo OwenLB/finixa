@@ -1,0 +1,401 @@
+---
+import DashboardContent from './DashboardContent.astro';
+import type { Translations } from '../i18n/translations';
+
+interface Props {
+  t: Translations['mockup'];
+}
+
+const { t } = Astro.props;
+
+const chaosPositions = [
+  { x: '-380', y: '-150', r: '-8' },
+  { x: '340',  y: '-170', r: '6' },
+  { x: '-330', y: '110',  r: '13' },
+  { x: '350',  y: '130',  r: '-11' },
+  { x: '-210', y: '-240', r: '5' },
+  { x: '230',  y: '-210', r: '-15' },
+  { x: '-250', y: '200',  r: '-7' },
+  { x: '210',  y: '210',  r: '10' },
+];
+---
+
+<section class="phone-section" id="phone-scroll-section">
+  <div class="phone-sticky">
+
+    <!-- Chaos cards — volent vers le téléphone -->
+    <div class="chaos-overlay" aria-hidden="true">
+      {t.chaos.map((card, i) => (
+        <div class="chaos-card" data-x={chaosPositions[i].x} data-y={chaosPositions[i].y} data-r={chaosPositions[i].r}>
+          <span class="cc-emoji">{card.emoji}</span><span class="cc-text">{card.label}</span>
+        </div>
+      ))}
+    </div>
+
+    <!-- Téléphone -->
+    <div class="phone-wrap">
+      <div class="iphone-frame">
+        <!-- Dynamic Island (taille réelle) -->
+        <div class="iphone-island"></div>
+
+        <div class="iphone-screens">
+
+          <!-- Screen 0: Splash -->
+          <div class="pscreen" id="pscreen-0">
+            <div class="splash-body">
+              <svg class="splash-logo" width="56" height="60" viewBox="0 0 587 626" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M293.279 430.5L194.779 602C182.76 615.422 174.071 620.799 152.779 624H55.7787L5.77869 538C-2.19366 515.362 -2.69092 502.069 15.2787 475.5L108.779 312.5L9.77869 141C-1.59082 118.474 -3.52051 105.261 9.77869 79.5L55.7787 0.5H155.779C176.081 5.59723 184.819 11.4072 195.779 27L293.779 195.5L388.779 30.5C400.8 12.4626 409.952 5.6443 431.779 1H531.279L582.279 89.5C587.32 110.347 588.649 121.968 575.779 142L536.279 211L578.279 287C586.696 309.568 587.136 322.086 574.779 344L535.279 412L575.279 481.5C586.906 502.35 589.756 514.91 579.279 541L531.279 625H430.279C412.926 621.843 404.467 616.108 390.779 601.5L293.279 430.5ZM234.779 328L74.2787 609.5L159.279 609C171.617 606.088 175.704 602.62 180.779 595L284.779 415.5L234.779 328ZM284.279 211L234.779 296L73.2787 17H157.279C169.97 19.2539 174.872 23.0512 181.279 32.5L284.279 211ZM565.779 129L410.779 400L373.779 334C365.379 316.804 365.477 305.718 378.779 282L526.779 24.5L565.779 92C574.022 104.792 574.09 112.881 565.779 129ZM568.779 527.5L526.279 601.5L486.779 532.5C482.201 518.441 482.358 510.559 486.779 496.5L526.279 428L568.779 500C571.487 511.84 572.913 518.441 568.779 527.5Z"/>
+              </svg>
+              <span class="splash-name">Finixa</span>
+              <span class="splash-tagline">{t.splash.tagline}</span>
+            </div>
+          </div>
+
+          <!-- Screen 1: Transactions -->
+          <div class="pscreen s-tx" id="pscreen-1">
+            <div class="s-header">
+              <h2 class="s-title">{t.tx.title}</h2>
+            </div>
+            <div class="s-month-nav">
+              <span class="s-nav-arr">‹</span>
+              <span class="s-month-lbl">{t.month}</span>
+              <span class="s-nav-arr">›</span>
+            </div>
+            <div class="s-search">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <span>{t.tx.search}</span>
+            </div>
+            <div class="s-filters">
+              <span class="s-filter-pill">{t.tx.filterUncleared}</span>
+              <span class="s-filter-pill">{t.tx.filterUncategorized}</span>
+            </div>
+
+            <div class="s-list">
+              <div class="s-date-row"><span>{t.tx.today}</span><span>-10,00 €</span></div>
+              <div class="s-item">
+                <div class="s-icon s-icon-green"><svg viewBox="0 0 24 24" fill="#22c55e" width="15" height="15"><path d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM7.17 14h10l1.76-7H5.21L4.27 3H1v2h2l3.6 7.59L7.5 15H19v-2H8.52z"/></svg></div>
+                <div class="s-item-info"><span class="s-item-name">{t.tx.catGroceries}</span><span class="s-item-cat">{t.tx.catGroceries}</span></div>
+                <span class="s-item-amt">-10,00 €</span>
+                <div class="s-circle"></div>
+              </div>
+
+              <div class="s-date-row"><span>{t.tx.date22}</span><span>-13,50 €</span></div>
+              <div class="s-item">
+                <div class="s-icon s-icon-purple"><svg viewBox="0 0 24 24" fill="#a855f7" width="15" height="15"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5S14.67 12 15.5 12s1.5.67 1.5 1.5S16.33 15 15.5 15zm3-3c-.83 0-1.5-.67-1.5-1.5S17.67 9 18.5 9s1.5.67 1.5 1.5S19.33 12 18.5 12z"/></svg></div>
+                <div class="s-item-info"><span class="s-item-name">Ciné UGC</span><span class="s-item-cat">{t.tx.catLeisure}</span></div>
+                <span class="s-item-amt">-13,50 €</span>
+                <div class="s-circle"></div>
+              </div>
+
+              <div class="s-date-row"><span>{t.tx.date21}</span><span>-43,10 €</span></div>
+              <div class="s-item">
+                <div class="s-icon s-icon-green"><svg viewBox="0 0 24 24" fill="#22c55e" width="15" height="15"><path d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM7.17 14h10l1.76-7H5.21L4.27 3H1v2h2l3.6 7.59L7.5 15H19v-2H8.52z"/></svg></div>
+                <div class="s-item-info"><span class="s-item-name">Monoprix</span><span class="s-item-cat">{t.tx.catGroceries}</span></div>
+                <span class="s-item-amt">-43,10 €</span>
+                <div class="s-circle"></div>
+              </div>
+
+              <div class="s-date-row"><span>{t.tx.date16}</span><span>-52,30 €</span></div>
+              <div class="s-item">
+                <div class="s-icon s-icon-green"><svg viewBox="0 0 24 24" fill="#22c55e" width="15" height="15"><path d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM7.17 14h10l1.76-7H5.21L4.27 3H1v2h2l3.6 7.59L7.5 15H19v-2H8.52z"/></svg></div>
+                <div class="s-item-info"><span class="s-item-name">Lidl</span><span class="s-item-cat">{t.tx.catGroceries}</span></div>
+                <span class="s-item-amt">-52,30 €</span>
+                <div class="s-circle s-circle-done">✓</div>
+              </div>
+
+              <div class="s-date-row"><span>{t.tx.date15}</span><span>-78,00 €</span></div>
+              <div class="s-item">
+                <div class="s-icon s-icon-blue"><svg viewBox="0 0 24 24" fill="#3b82f6" width="15" height="15"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/></svg></div>
+                <div class="s-item-info"><span class="s-item-name">Macif</span><span class="s-item-cat">{t.tx.catInsurance}</span></div>
+                <span class="s-item-amt">-78,00 €</span>
+                <div class="s-circle s-circle-done">✓</div>
+              </div>
+
+              <div class="s-date-row"><span>{t.tx.date14}</span><span>-13,99 €</span></div>
+              <div class="s-item">
+                <div class="s-icon s-icon-pink"><svg viewBox="0 0 24 24" fill="#ec4899" width="15" height="15"><path d="M8 6.82v10.36c0 .79.87 1.27 1.54.84l8.14-5.18a1 1 0 0 0 0-1.69L9.54 5.98A.998.998 0 0 0 8 6.82z"/></svg></div>
+                <div class="s-item-info"><span class="s-item-name">Netflix</span><span class="s-item-cat">Streaming</span></div>
+                <span class="s-item-amt">-13,99 €</span>
+                <div class="s-circle s-circle-done">✓</div>
+              </div>
+            </div>
+
+            <div class="s-tabbar">
+              <div class="s-tab"><svg viewBox="0 0 24 24" fill="currentColor" width="19" height="19"><path d="M3 3h8v8H3zm0 10h8v8H3zM13 3h8v8h-8zm0 10h8v8h-8z"/></svg><span>{t.tabs.dashboard}</span></div>
+              <div class="s-tab s-tab-on"><svg viewBox="0 0 24 24" fill="currentColor" width="19" height="19"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg><span>{t.tabs.transactions}</span></div>
+              <div class="s-tab-fab"><svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></div>
+              <div class="s-tab"><svg viewBox="0 0 24 24" fill="currentColor" width="19" height="19"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg><span>{t.tabs.budget}</span></div>
+              <div class="s-tab"><svg viewBox="0 0 24 24" fill="currentColor" width="19" height="19"><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg><span>{t.tabs.more}</span></div>
+            </div>
+          </div>
+
+          <!-- Screen 2: Dashboard -->
+          <DashboardContent id="pscreen-2" t={t} />
+
+        </div>
+        <div class="iphone-home-bar"></div>
+      </div>
+
+      <!-- Progress dots -->
+      <div class="phone-dots">
+        <div class="pdot" id="pdot-0"></div>
+        <div class="pdot" id="pdot-1"></div>
+        <div class="pdot" id="pdot-2"></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<style>
+  .phone-section {
+    height: 400vh;
+    position: relative;
+    background: var(--bg);
+  }
+
+  .phone-sticky {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: visible;
+  }
+
+  /* ─── Chaos overlay ─── */
+  .chaos-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .chaos-card {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+    white-space: nowrap;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    will-change: transform, opacity;
+  }
+
+  .cc-emoji { font-size: 15px; }
+
+  /* ─── Phone wrap ─── */
+  .phone-wrap {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+  }
+
+  .iphone-frame {
+    width: 300px;
+    height: 630px;
+    background: var(--ph-frame-bg);
+    border-radius: 46px;
+    border: 1px solid var(--ph-frame-border);
+    position: relative;
+    overflow: hidden;
+    box-shadow:
+      0 0 0 6px var(--ph-frame-ring),
+      0 0 0 7px var(--ph-frame-border),
+      0 40px 80px rgba(0,0,0,0.5);
+    flex-shrink: 0;
+  }
+
+  /* Dynamic Island */
+  .iphone-island {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 88px;
+    height: 26px;
+    background: var(--ph-island-bg);
+    border-radius: 14px;
+    z-index: 30;
+  }
+
+  .iphone-screens {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    border-radius: 46px;
+  }
+
+  .iphone-home-bar {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 4px;
+    background: var(--ph-home-bar);
+    border-radius: 2px;
+    z-index: 30;
+  }
+
+  /* ─── Splash ─── */
+  .splash-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    padding-bottom: 30px;
+  }
+
+  .splash-name {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    color: var(--ph-text);
+  }
+
+  .splash-tagline {
+    font-size: 10px;
+    color: var(--ph-text-subtle);
+    font-weight: 500;
+    text-align: center;
+    padding: 0 24px;
+    line-height: 1.5;
+  }
+
+  /* ─── Progress dots ─── */
+  .phone-dots {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-self: center;
+  }
+
+  .pdot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--text) 20%, transparent);
+    transition: background 0.3s, transform 0.3s;
+  }
+
+  .pdot-on {
+    background: var(--text);
+    transform: scale(1.5);
+  }
+
+  @media (max-width: 600px) {
+    .phone-section { height: 350vh; }
+    .iphone-frame { width: 200px; height: 420px; border-radius: 34px; }
+    .iphone-screens { border-radius: 34px; }
+    .iphone-island { width: 66px; height: 20px; top: 8px; }
+    .iphone-home-bar { width: 72px; }
+    .phone-dots { display: none; }
+    .chaos-card { font-size: 10px; padding: 5px 9px; gap: 5px; }
+    .cc-emoji { font-size: 13px; }
+  }
+</style>
+
+<script>
+  import gsap from 'gsap';
+  import ScrollTrigger from 'gsap/ScrollTrigger';
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  function init() {
+    const section = document.getElementById('phone-scroll-section');
+    const s0 = document.getElementById('pscreen-0');
+    const s1 = document.getElementById('pscreen-1');
+    const s2 = document.getElementById('pscreen-2');
+    const cards = document.querySelectorAll<HTMLElement>('.chaos-card');
+    const txItems = document.querySelectorAll<HTMLElement>('#pscreen-1 .s-item');
+    const dots = [
+      document.getElementById('pdot-0'),
+      document.getElementById('pdot-1'),
+      document.getElementById('pdot-2'),
+    ];
+
+    if (!section || !s0 || !s1 || !s2) return;
+
+    // ── Position chaos cards from phone center ──
+    const posScale = window.innerWidth < 600 ? window.innerWidth / 800 : 1;
+    cards.forEach((card) => {
+      gsap.set(card, {
+        xPercent: -50,
+        yPercent: -50,
+        x: parseFloat(card.dataset.x || '0') * posScale,
+        y: parseFloat(card.dataset.y || '0') * posScale,
+        rotation: parseFloat(card.dataset.r || '0'),
+      });
+    });
+
+    // ── Screens: 1 & 2 start off-screen right ──
+    gsap.set(s1, { xPercent: 100 });
+    gsap.set(s2, { xPercent: 100 });
+
+    // ── Tx rows: initially hidden, stacked right ──
+    gsap.set(txItems, { opacity: 0, x: 18 });
+
+    // ── Main timeline ──
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: section,
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: 1.2,
+        onUpdate(self) {
+          const p = self.progress;
+          dots.forEach((d) => d?.classList.remove('pdot-on'));
+          if (p < 0.50) dots[0]?.classList.add('pdot-on');
+          else if (p < 0.84) dots[1]?.classList.add('pdot-on');
+          else dots[2]?.classList.add('pdot-on');
+        },
+      },
+    });
+
+    // t 0→3 : hold (splash, cards scattered)
+
+    // t 3→5 : chaos cards volent vers le centre du téléphone
+    cards.forEach((card, i) => {
+      tl.to(
+        card,
+        { x: 0, y: 0, rotation: 0, scale: 0.4, opacity: 0, duration: 1.8, ease: 'power2.in' },
+        3 + i * 0.07
+      );
+    });
+
+    // t 5.5→6.5 : splash → transactions
+    tl.to(s0, { xPercent: -100, duration: 1, ease: 'power2.inOut' }, 5.5);
+    tl.to(s1, { xPercent: 0,    duration: 1, ease: 'power2.inOut' }, 5.5);
+
+    // t 6.6→8 : transaction rows apparaissent un par un
+    txItems.forEach((row, i) => {
+      tl.to(
+        row,
+        { opacity: 1, x: 0, duration: 0.4, ease: 'power2.out' },
+        6.6 + i * 0.22
+      );
+    });
+
+    // t 8.4→9.4 : transactions → dashboard
+    tl.to(s1, { xPercent: -100, duration: 1, ease: 'power2.inOut' }, 8.4);
+    tl.to(s2, { xPercent: 0,    duration: 1, ease: 'power2.inOut' }, 8.4);
+
+    // t 9.4→10 : hold sur dashboard
+    tl.to({}, { duration: 0.6 }, 9.4);
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+  init();
+</script>

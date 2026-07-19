@@ -1,0 +1,223 @@
+// ============================================================
+// MIXINS — disponibles dans tout composant <style lang="scss">
+// (auto-injectés via nuxt.config.ts additionalData)
+// ============================================================
+
+/// Label uppercase muted — utilisé partout pour les labels de champs
+@mixin label-caps {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+}
+
+/// Input standard — background elevated, border accent au focus
+@mixin input-field {
+  width: 100%;
+  background: var(--color-bg-elevated);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  padding: 13px 14px;
+  // 16px : en deçà, iOS zoome automatiquement au focus — c'est ce qui imposait
+  // le hack maximum-scale=1 (qui cassait le pinch-zoom, WCAG 1.4.4). Cf. U15.
+  font-size: 16px;
+  color: var(--color-text-primary);
+  outline: none;
+  transition: border-color $transition-fast;
+
+  &::placeholder { color: var(--color-text-muted); }
+  &:focus         { border-color: var(--color-accent); }
+  &:disabled      { opacity: 0.45; cursor: not-allowed; }
+}
+
+/// Bouton pleine largeur — radius léger (même que les champs)
+@mixin btn-action($bg: var(--color-accent)) {
+  width: 100%;
+  padding: 15px;
+  background: $bg;
+  color: var(--color-accent-fg);
+  border-radius: var(--radius-md);
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+  transition: opacity $transition-fast;
+
+  &:active { opacity: 0.85; }
+}
+
+/// Bouton icône circulaire
+@mixin btn-icon($size: 36px) {
+  width: $size;
+  height: $size;
+  border-radius: 99px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity $transition-fast;
+  &:active { opacity: 0.7; }
+}
+
+// ============================================================
+// PRIMITIVE PALETTE  —  valeurs brutes, ne jamais utiliser
+//                        directement dans les composants
+// ============================================================
+
+// Neutres
+$p-black:     #141414;
+$p-gray-900:  #1f1f1f;
+$p-gray-800:  #2a2a2a;
+$p-gray-700:  #3d3d3d;
+$p-gray-500:  #6b6b6b;
+$p-gray-400:  #a1a1a1;
+$p-gray-200:  #e4e4e4;
+$p-gray-100:  #f4f4f5;
+$p-white:     #ffffff;
+
+// Accent — Indigo
+$p-indigo-300: #a5b4fc;
+$p-indigo-400: #818cf8;
+$p-indigo-500: #6366f1;
+
+// Status
+$p-green:   #34d399;
+$p-yellow:  #fbbf24;
+$p-red:     #f87171;
+
+// ============================================================
+// SCSS VARIABLES — build-time, pour calc() etc. dans les scss
+// ============================================================
+
+$tab-bar-height:   60px;
+$sidebar-width:    240px;
+$page-padding-x:   20px;
+$page-padding-top: 24px;
+
+$breakpoint-sm: 480px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 1024px;
+
+$transition-fast: 150ms ease;
+$transition-base: 250ms ease;
+
+// ============================================================
+// TOKENS SÉMANTIQUES — invariants (layout, typo, motion)
+// ============================================================
+
+:root {
+  // Typographie
+  --font-base:  'DM Sans', 'Inter', system-ui, sans-serif;
+  --font-title: 'Clash Display', 'DM Sans', sans-serif;
+
+  // Layout
+  --tab-bar-height:   #{$tab-bar-height};
+  --sidebar-width:    #{$sidebar-width};
+  --page-padding-x:   #{$page-padding-x};
+  --page-padding-top: #{$page-padding-top};
+
+  // Radius — "léger" pour champs et boutons full-size, rond pour petits boutons
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  // Motion
+  --transition-fast: #{$transition-fast};
+  --transition-base: #{$transition-base};
+
+  // Status (stable entre les thèmes)
+  --color-success: #{$p-green};
+  --color-danger:  #{$p-red};
+  --color-warning: #{$p-yellow};
+
+  // Swipe action backgrounds — foncé pendant le glissement, vif au seuil
+  --color-swipe-delete:        #991b1b;   // rouge foncé (en cours)
+  --color-swipe-delete-vivid:  #ef4444;   // rouge vif (seuil franchi)
+  --color-swipe-check:         #065f46;   // vert foncé (en cours)
+  --color-swipe-check-vivid:   #10b981;   // vert vif (seuil franchi)
+  --color-swipe-uncheck:       #374151;   // gris foncé (en cours)
+  --color-swipe-uncheck-vivid: #6b7280;   // gris vif (seuil franchi)
+}
+
+// ============================================================
+// THÈME DARK  (défaut)
+// ============================================================
+
+:root,
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  // Backgrounds
+  --color-bg:          #{$p-black};
+  --color-bg-surface:  #{$p-gray-900};
+  --color-bg-card:     #{$p-gray-900};
+  --color-bg-elevated: #{$p-gray-800};
+
+  // Text
+  --color-text-primary:   #{$p-gray-100};
+  --color-text-secondary: #{$p-gray-400};
+  // #949494 : contraste WCAG AA (≥4.5:1) sur le fond et les surfaces dark,
+  // contrairement à l'ancien #6b6b6b (3.46:1).
+  --color-text-muted:     #949494;
+
+  // Border
+  --color-border:        #{$p-gray-800};
+  --color-border-subtle: #272727;
+
+  // Accent — blanc en dark (pas de bleu)
+  --color-accent:    #{$p-gray-100};
+  --color-accent-fg: #{$p-black};
+
+  // Shadows
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.6);
+
+  // Navigation
+  --color-nav-bg:       #{$p-black};
+  --color-nav-border:   #{$p-gray-900};
+  --color-nav-active:   #{$p-gray-100};
+  --color-nav-inactive: #949494;
+  --color-nav-add-bg:   #{$p-gray-100};
+  --color-nav-add-fg:   #{$p-black};
+}
+
+// ============================================================
+// THÈME LIGHT
+// ============================================================
+
+[data-theme='light'] {
+  color-scheme: light;
+
+  // Backgrounds
+  --color-bg:          #f5f5f5;
+  --color-bg-surface:  #{$p-white};
+  --color-bg-card:     #{$p-white};
+  --color-bg-elevated: #{$p-gray-200};
+
+  // Text
+  --color-text-primary:   #111111;
+  --color-text-secondary: #555555;
+  // #6e6e6e : contraste WCAG AA (≥4.5:1) sur fond et surfaces clairs,
+  // contrairement à l'ancien #999999 (2.85:1).
+  --color-text-muted:     #6e6e6e;
+
+  // Border
+  --color-border:        #{$p-gray-200};
+  --color-border-subtle: #ebebeb;
+
+  // Accent — noir en light (pas de bleu)
+  --color-accent:    #111111;
+  --color-accent-fg: #{$p-white};
+
+  // Shadows
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+
+  // Navigation
+  --color-nav-bg:       #{$p-white};
+  --color-nav-border:   #{$p-gray-200};
+  --color-nav-active:   #111111;
+  --color-nav-inactive: #6e6e6e;
+  --color-nav-add-bg:   #111111;
+  --color-nav-add-fg:   #{$p-white};
+}

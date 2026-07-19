@@ -1,0 +1,9 @@
+# Config minimale pour la CLI Supabase — permet `supabase db start` (stack
+# locale Docker) et `supabase test db` (pgTAP) en CI. La prod tourne sur
+# PostgreSQL 17.
+project_id = "finixa"
+
+[db]
+port = 54322
+shadow_port = 54320
+major_version = 17

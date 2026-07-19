@@ -1,0 +1,148 @@
+---
+import type { Translations } from '../i18n/translations';
+
+interface Props {
+  t: Translations['testimonials'];
+}
+
+const { t } = Astro.props;
+const row1 = t.row1;
+const row2 = t.row2;
+---
+
+<section class="section testimonials">
+  <div class="container">
+    <div class="section-label">{t.sectionLabel}</div>
+
+    <h2 class="test-title reveal-up">
+      {t.titleBefore} <em class="pencil-mark">{t.titleItalic}</em>
+    </h2>
+  </div>
+
+  <!-- Row 1 — scroll left -->
+  <div class="marquee-wrapper">
+    <div class="marquee-track track-left">
+      {[...row1, ...row1].map(card => (
+        <div class={`test-card${card.featured ? ' test-card-featured' : ''}`}>
+          <img class="test-avatar" src={`https://i.pravatar.cc/96?u=${encodeURIComponent(card.name)}`} alt="" loading="lazy" width="48" height="48" />
+          <div class="test-body">
+            <div class="test-stars">★★★★★</div>
+            <blockquote>"{card.quote}"</blockquote>
+            <div class="test-author">
+              <span class="test-name">{card.name}</span>
+              <span class="test-relation">{card.relation}</span>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <!-- Row 2 — scroll right -->
+  <div class="marquee-wrapper">
+    <div class="marquee-track track-right">
+      {[...row2, ...row2].map(card => (
+        <div class={`test-card${card.featured ? ' test-card-featured' : ''}`}>
+          <img class="test-avatar" src={`https://i.pravatar.cc/96?u=${encodeURIComponent(card.name)}`} alt="" loading="lazy" width="48" height="48" />
+          <div class="test-body">
+            <div class="test-stars">★★★★★</div>
+            <blockquote>"{card.quote}"</blockquote>
+            <div class="test-author">
+              <span class="test-name">{card.name}</span>
+              <span class="test-relation">{card.relation}</span>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <div class="container">
+    <p class="test-disclaimer reveal-fade delay-3">{t.disclaimer}</p>
+  </div>
+</section>
+
+<style>
+  .test-title {
+    font-size: clamp(32px, 4vw, 52px);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+    margin-bottom: 56px;
+  }
+
+  .marquee-wrapper {
+    overflow: hidden;
+    margin-bottom: 16px;
+    mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+  }
+
+  .marquee-track {
+    display: flex;
+    gap: 16px;
+    width: max-content;
+    padding: 8px 0;
+  }
+
+  .marquee-wrapper:hover .marquee-track { animation-play-state: paused; }
+
+  @keyframes scrollLeft  { 0% { transform: translateX(0); }   100% { transform: translateX(-50%); } }
+  @keyframes scrollRight { 0% { transform: translateX(-50%); } 100% { transform: translateX(0); } }
+
+  .track-left  { animation: scrollLeft  38s linear infinite; }
+  .track-right { animation: scrollRight 44s linear infinite; }
+
+  .test-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 24px 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    width: 300px;
+    flex-shrink: 0;
+    transition: border-color var(--transition);
+  }
+
+  .test-card:hover { border-color: var(--border-hover); }
+
+  .test-card-featured {
+    border-color: var(--border-hover);
+    background: linear-gradient(135deg, var(--surface) 0%, var(--surface-2) 100%);
+  }
+
+  .test-avatar {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    background: var(--surface-2);
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .test-stars { font-size: 11px; color: var(--text); letter-spacing: 2px; margin-bottom: 8px; }
+
+  .test-body { flex: 1; display: flex; flex-direction: column; }
+
+  .test-body blockquote {
+    font-size: 13.5px;
+    line-height: 1.65;
+    color: var(--text);
+    font-style: italic;
+    flex: 1;
+    margin-bottom: 16px;
+  }
+
+  .test-author { display: flex; flex-direction: column; gap: 2px; }
+  .test-name     { font-size: 13px; font-weight: 700; color: var(--text); }
+  .test-relation { font-size: 11px; color: var(--text-muted); }
+
+  .test-disclaimer { font-size: 12px; color: var(--text-subtle); text-align: center; margin-top: 12px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .track-left, .track-right { animation: none; }
+  }
+</style>

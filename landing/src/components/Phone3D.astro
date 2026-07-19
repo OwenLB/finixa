@@ -1,0 +1,264 @@
+---
+// iPhone 3D temps réel (WebGL / three.js)
+// L'écran est texturé avec un rendu de l'app (light/dark).
+---
+
+<div class="phone3d-stage" id="phone3d-stage" aria-hidden="true">
+  <noscript>
+    <img src="/phone-screen-light.png" alt="Aperçu de l'app Finixa" class="phone3d-fallback" />
+  </noscript>
+</div>
+
+<style>
+  .phone3d-stage {
+    position: relative;
+    height: clamp(440px, 72vh, 760px);
+    aspect-ratio: 360 / 720;
+    margin: 0 auto;
+    touch-action: pan-y;
+  }
+
+  .phone3d-stage :global(canvas) {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+    overflow: visible;
+  }
+
+  .phone3d-fallback {
+    height: 100%;
+    width: auto;
+    margin: 0 auto;
+    border-radius: 38px;
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.25);
+  }
+
+  @media (max-width: 600px) {
+    .phone3d-stage { height: clamp(380px, 56vh, 520px); }
+  }
+</style>
+
+<script>
+  import * as THREE from 'three';
+  import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
+
+  function initPhone3D() {
+    const stage = document.getElementById('phone3d-stage');
+    if (!stage || stage.dataset.ready === '1') return;
+    stage.dataset.ready = '1';
+
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // ── Renderer ──
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.05;
+    stage.appendChild(renderer.domElement);
+
+    // ── Scene / Camera ──
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 100);
+    camera.position.set(0, 0, 15);
+
+    // ── Environnement (reflets studio sur le titane) ──
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
+    // ── Lumières ──
+    const key = new THREE.DirectionalLight(0xffffff, 2.4);
+    key.position.set(4, 6, 8);
+    scene.add(key);
+    const rim = new THREE.DirectionalLight(0xffffff, 1.4);
+    rim.position.set(-6, 2, -4);
+    scene.add(rim);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.35));
+
+    // ── Géométrie iPhone ──
+    const phone = new THREE.Group();
+    scene.add(phone);
+
+    // Dimensions (unités monde)
+    const tex = { w: 430, h: 1040 };          // app (932) + marges haut (80) / bas (28)
+    const screenW = 2.953;                     // largeur conservée (plein cadre)
+    const screenH = screenW * (tex.h / tex.w);
+    const bezel = 0.085;
+    const bodyW = screenW + bezel * 2;
+    const bodyH = screenH + bezel * 2;
+    const depth = 0.46;
+    const radius = 0.62;
+
+    // Forme arrondie centrée
+    function roundedRectShape(w: number, h: number, r: number) {
+      const s = new THREE.Shape();
+      const x = -w / 2, y = -h / 2;
+      s.moveTo(x + r, y);
+      s.lineTo(x + w - r, y);
+      s.quadraticCurveTo(x + w, y, x + w, y + r);
+      s.lineTo(x + w, y + h - r);
+      s.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      s.lineTo(x + r, y + h);
+      s.quadraticCurveTo(x, y + h, x, y + h - r);
+      s.lineTo(x, y + r);
+      s.quadraticCurveTo(x, y, x + r, y);
+      return s;
+    }
+
+    // Corps (titane) — extrusion avec bevel pour les bords arrondis
+    const bodyGeo = new THREE.ExtrudeGeometry(roundedRectShape(bodyW, bodyH, radius), {
+      depth: depth - 0.12,
+      bevelEnabled: true,
+      bevelThickness: 0.04,
+      bevelSize: 0.03,
+      bevelSegments: 6,
+      curveSegments: 24,
+    });
+    bodyGeo.center();
+    const bodyMat = new THREE.MeshStandardMaterial({
+      color: 0x2b2b2e,
+      metalness: 1.0,
+      roughness: 0.34,
+    });
+    const body = new THREE.Mesh(bodyGeo, bodyMat);
+    phone.add(body);
+
+    // Plaque arrière mate (verre dépoli)
+    const backGeo = new THREE.ExtrudeGeometry(
+      roundedRectShape(bodyW - 0.05, bodyH - 0.05, radius - 0.02),
+      { depth: 0.02, bevelEnabled: false, curveSegments: 24 }
+    );
+    backGeo.center();
+    const back = new THREE.Mesh(
+      backGeo,
+      new THREE.MeshStandardMaterial({ color: 0x1c1c1f, metalness: 0.6, roughness: 0.5 })
+    );
+    back.position.z = -depth / 2 - 0.01;
+    phone.add(back);
+
+    // Écran (texture de l'app) — coins arrondis transparents déjà cuits dans le PNG
+    const loader = new THREE.TextureLoader();
+    function loadScreenTexture(dark: boolean) {
+      const t = loader.load(dark ? '/phone-screen-dark.png' : '/phone-screen-light.png');
+      t.colorSpace = THREE.SRGBColorSpace;
+      t.generateMipmaps = false;
+      t.minFilter = THREE.LinearFilter;
+      t.anisotropy = renderer.capabilities.getMaxAnisotropy();
+      return t;
+    }
+    const screenMat = new THREE.MeshBasicMaterial({
+      map: loadScreenTexture(document.documentElement.getAttribute('data-theme') === 'dark'),
+      transparent: true,
+      toneMapped: false,
+    });
+    const screen = new THREE.Mesh(new THREE.PlaneGeometry(screenW, screenH), screenMat);
+    screen.position.z = depth / 2 + 0.001;
+    phone.add(screen);
+
+    // Vitre (reflets) par-dessus l'écran — légèrement rentrée pour ne pas dépasser
+    const glass = new THREE.Mesh(
+      new THREE.PlaneGeometry(screenW * 0.96, screenH * 0.985),
+      new THREE.MeshStandardMaterial({
+        color: 0xffffff,
+        metalness: 0.1,
+        roughness: 0.06,
+        transparent: true,
+        opacity: 0.05,
+      })
+    );
+    glass.position.z = depth / 2 + 0.02;
+    phone.add(glass);
+
+    // Dynamic Island (pilule arrondie)
+    const islandGeo = new THREE.ShapeGeometry(roundedRectShape(0.92, 0.3, 0.15), 12);
+    islandGeo.translate(0, screenH / 2 - 0.42, 0);
+    const island = new THREE.Mesh(
+      islandGeo,
+      new THREE.MeshStandardMaterial({ color: 0x05050a, metalness: 0.3, roughness: 0.2 })
+    );
+    island.position.z = depth / 2 + 0.03;
+    phone.add(island);
+
+    // Boutons latéraux
+    const btnMat = new THREE.MeshStandardMaterial({ color: 0x242427, metalness: 1, roughness: 0.4 });
+    const mkBtn = (w: number, h: number, x: number, y: number) => {
+      const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, depth * 0.5), btnMat);
+      b.position.set(x, y, 0);
+      phone.add(b);
+    };
+    mkBtn(0.07, 0.9, bodyW / 2 + 0.02, 0.4);        // power
+    mkBtn(0.07, 0.5, -bodyW / 2 - 0.02, 1.1);        // volume +
+    mkBtn(0.07, 0.5, -bodyW / 2 - 0.02, 0.45);       // volume -
+
+    // ── Pose initiale (vue 3/4, écran tourné vers la droite) ──
+    const base = { rx: 0.12, ry: -0.42 };
+    phone.rotation.set(base.rx, base.ry, 0);
+
+    // ── Interaction ──
+    const target = { rx: base.rx, ry: base.ry };
+    let scrollRy = 0;
+    let floatT = 0;
+
+    if (!reduce) {
+      const heroEl = document.getElementById('hero') || stage;
+      heroEl.addEventListener('pointermove', (e) => {
+        const r = heroEl.getBoundingClientRect();
+        const px = (e.clientX - r.left) / r.width - 0.5;
+        const py = (e.clientY - r.top) / r.height - 0.5;
+        target.ry = base.ry + px * 0.6;
+        target.rx = base.rx - py * 0.4;
+      });
+      heroEl.addEventListener('pointerleave', () => {
+        target.rx = base.rx;
+        target.ry = base.ry;
+      });
+      window.addEventListener('scroll', () => {
+        const vh = window.innerHeight;
+        const p = Math.min(Math.max(window.scrollY / vh, 0), 1);
+        scrollRy = p * 0.9;
+      }, { passive: true });
+    }
+
+    // ── Resize ──
+    function resize() {
+      const w = stage.clientWidth, h = stage.clientHeight;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      // cadrage vertical : le téléphone tient en hauteur quelle que soit la largeur
+      const fitH = bodyH * 1.12;
+      const dist = (fitH / 2) / Math.tan((camera.fov * Math.PI) / 360);
+      camera.position.z = dist;
+      camera.updateProjectionMatrix();
+    }
+    const ro = new ResizeObserver(resize);
+    ro.observe(stage);
+    resize();
+
+    // ── Thème : swap de texture ──
+    const themeObs = new MutationObserver(() => {
+      const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+      const old = screenMat.map;
+      screenMat.map = loadScreenTexture(dark);
+      screenMat.needsUpdate = true;
+      old?.dispose();
+    });
+    themeObs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+    // ── Boucle ──
+    const clock = new THREE.Clock();
+    function animate() {
+      const dt = clock.getDelta();
+      floatT += dt;
+      if (!reduce) {
+        phone.rotation.x += (target.rx - phone.rotation.x) * 0.06;
+        phone.rotation.y += (target.ry + scrollRy - phone.rotation.y) * 0.06;
+        phone.position.y = Math.sin(floatT * 0.9) * 0.12;
+      }
+      renderer.render(scene, camera);
+    }
+    renderer.setAnimationLoop(animate);
+  }
+
+  document.addEventListener('DOMContentLoaded', initPhone3D);
+  initPhone3D();
+</script>

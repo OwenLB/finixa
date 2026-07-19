@@ -1,0 +1,362 @@
+---
+// UNE seule maquette iPhone 3D (un seul contexte WebGL) sur un canvas fixe plein écran.
+// Elle se positionne sur l'ancre #phone-anchor-hero, puis voyage vers #pscroll-stage
+// pendant le scroll et y joue le morph des écrans (add → transactions → dashboard).
+---
+
+<div class="phone-stage-canvas" id="phone-stage-canvas" aria-hidden="true"></div>
+
+<style>
+  .phone-stage-canvas {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  .phone-stage-canvas :global(canvas) { display: block; }
+  @media (prefers-reduced-motion: reduce) {
+    .phone-stage-canvas { transition: none; }
+  }
+</style>
+
+<script>
+  import * as THREE from 'three';
+  import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
+
+  function initPhoneStage() {
+    const host = document.getElementById('phone-stage-canvas');
+    if (!host || host.dataset.ready === '1') return;
+    host.dataset.ready = '1';
+
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.05;
+    host.appendChild(renderer.domElement);
+    renderer.domElement.addEventListener('webglcontextlost', (e) => e.preventDefault(), false);
+
+    const scene = new THREE.Scene();
+    const FOV = 30, CAMZ = 12;
+    const camera = new THREE.PerspectiveCamera(FOV, 1, 0.1, 100);
+    camera.position.set(0, 0, CAMZ);
+
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
+    const key = new THREE.DirectionalLight(0xffffff, 2.4); key.position.set(4, 6, 8); scene.add(key);
+    const rim = new THREE.DirectionalLight(0xffffff, 1.4); rim.position.set(-6, 2, -4); scene.add(rim);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.35));
+
+    const phone = new THREE.Group();
+    scene.add(phone);
+
+    // ── Géométrie (identique aux maquettes précédentes) ──
+    const tex = { w: 430, h: 1040 };          // app (932) + marges haut/bas
+    const screenW = 2.953;
+    const screenH = screenW * (tex.h / tex.w);
+    const bezel = 0.085;
+    const bodyW = screenW + bezel * 2;
+    const bodyH = screenH + bezel * 2;
+    const depth = 0.46;
+    const radius = 0.62;
+
+    function roundedRectShape(w: number, h: number, r: number) {
+      const s = new THREE.Shape();
+      const x = -w / 2, y = -h / 2;
+      s.moveTo(x + r, y);
+      s.lineTo(x + w - r, y); s.quadraticCurveTo(x + w, y, x + w, y + r);
+      s.lineTo(x + w, y + h - r); s.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      s.lineTo(x + r, y + h); s.quadraticCurveTo(x, y + h, x, y + h - r);
+      s.lineTo(x, y + r); s.quadraticCurveTo(x, y, x + r, y);
+      return s;
+    }
+
+    const bodyGeo = new THREE.ExtrudeGeometry(roundedRectShape(bodyW, bodyH, radius), {
+      depth: depth - 0.12, bevelEnabled: true, bevelThickness: 0.04, bevelSize: 0.03, bevelSegments: 6, curveSegments: 24,
+    });
+    bodyGeo.center();
+    phone.add(new THREE.Mesh(bodyGeo, new THREE.MeshStandardMaterial({ color: 0x2b2b2e, metalness: 1, roughness: 0.34 })));
+
+    // Plaque arrière
+    const backGeo = new THREE.ExtrudeGeometry(roundedRectShape(bodyW - 0.05, bodyH - 0.05, radius - 0.02), { depth: 0.02, bevelEnabled: false, curveSegments: 24 });
+    backGeo.center();
+    const back = new THREE.Mesh(backGeo, new THREE.MeshStandardMaterial({ color: 0x1c1c1f, metalness: 0.6, roughness: 0.5 }));
+    back.position.z = -depth / 2 - 0.01;
+    phone.add(back);
+
+    // Écrans (3 textures, crossfade)
+    const loader = new THREE.TextureLoader();
+    const isDark = () => document.documentElement.getAttribute('data-theme') === 'dark';
+    const SCREENS = ['phone-screen', 'screen-add', 'screen-tx', 'splash']; // dashboard, add, tx, chargement
+    function texUrl(base: string, dark: boolean) { return `/${base}-${dark ? 'dark' : 'light'}.png`; }
+    function mkTex(base: string) {
+      const t = loader.load(texUrl(base, isDark()));
+      t.colorSpace = THREE.SRGBColorSpace;
+      t.generateMipmaps = false;
+      t.minFilter = THREE.LinearFilter;
+      t.anisotropy = renderer.capabilities.getMaxAnisotropy();
+      return t;
+    }
+    const screenMats: THREE.MeshBasicMaterial[] = [];
+    SCREENS.forEach((base, i) => {
+      const mat = new THREE.MeshBasicMaterial({ map: mkTex(base), transparent: true, toneMapped: false, depthWrite: false, opacity: i === 0 ? 1 : 0 });
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(screenW, screenH), mat);
+      m.position.z = depth / 2 + 0.001 + i * 0.0008;
+      m.renderOrder = i + 1;
+      phone.add(m);
+      screenMats.push(mat);
+    });
+    // indices logiques : dashboard=0, add=1, tx=2, splash=3
+    const DASH = 0, ADD = 1, TX = 2, SPLASH = 3;
+
+    // Dynamic Island
+    const islandGeo = new THREE.ShapeGeometry(roundedRectShape(0.92, 0.3, 0.15), 12);
+    islandGeo.translate(0, screenH / 2 - 0.42, 0);
+    const island = new THREE.Mesh(islandGeo, new THREE.MeshStandardMaterial({ color: 0x05050a, metalness: 0.3, roughness: 0.2 }));
+    island.position.z = depth / 2 + 0.04; island.renderOrder = 10;
+    phone.add(island);
+
+    // Boutons
+    const btnMat = new THREE.MeshStandardMaterial({ color: 0x242427, metalness: 1, roughness: 0.4 });
+    const mkBtn = (w: number, h: number, x: number, y: number) => {
+      const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, depth * 0.5), btnMat);
+      b.position.set(x, y, 0); phone.add(b);
+    };
+    mkBtn(0.07, 0.9, bodyW / 2 + 0.02, 0.4);
+    mkBtn(0.07, 0.5, -bodyW / 2 - 0.02, 1.1);
+    mkBtn(0.07, 0.5, -bodyW / 2 - 0.02, 0.45);
+
+    // Thème : recharge des textures
+    new MutationObserver(() => {
+      SCREENS.forEach((base, i) => {
+        const old = screenMats[i].map;
+        screenMats[i].map = mkTex(base);
+        screenMats[i].needsUpdate = true;
+        old?.dispose();
+      });
+    }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+    // ── Resize ──
+    function resize() {
+      const w = window.innerWidth, h = window.innerHeight;
+      renderer.setSize(w, h, false);
+      renderer.domElement.style.width = w + 'px';
+      renderer.domElement.style.height = h + 'px';
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // px <-> world (plan z=0), à partir d'un rect DOM (viewport px)
+    function placeFromRect(rect: DOMRect) {
+      const visH = 2 * CAMZ * Math.tan((FOV * Math.PI) / 360);
+      const ppw = window.innerHeight / visH; // px par unité monde
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const wx = (cx - window.innerWidth / 2) / ppw;
+      const wy = (window.innerHeight / 2 - cy) / ppw;
+      const scale = (rect.height / (bodyH * ppw)) * 0.98;
+      return { wx, wy, scale };
+    }
+
+    // Pointeur (parallaxe douce)
+    let pointerX = 0, pointerY = 0;
+    if (!reduce) {
+      window.addEventListener('pointermove', (e) => {
+        pointerX = e.clientX / window.innerWidth - 0.5;
+        pointerY = e.clientY / window.innerHeight - 0.5;
+      });
+    }
+
+    // Légendes + points (dans la section pscroll)
+    const caps = Array.from(document.querySelectorAll<HTMLElement>('.pscroll .pcap'));
+    const dots = Array.from(document.querySelectorAll<HTMLElement>('.pscroll .pp-dot'));
+    const cards = Array.from(document.querySelectorAll<HTMLElement>('.pscroll-cards .ptx'));
+    const intro = document.getElementById('pscroll-intro');
+
+    // Paramètres d'animation
+    const smooth = (a: number) => a * a * (3 - 2 * a);
+    const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
+    const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+    const smoothstep = (a: number, b: number, x: number) => { const t = clamp01((x - a) / (b - a)); return t * t * (3 - 2 * t); };
+
+    // Paliers : chaque étape reste nette sur une large zone, fondu bref aux frontières.
+    const B1 = 0.34, B2 = 0.66, CW = 0.06; // frontières + demi-largeur de fondu
+    function stageWeights(p: number) {
+      const t1 = smoothstep(B1 - CW, B1 + CW, p);
+      const t2 = smoothstep(B2 - CW, B2 + CW, p);
+      return [1 - t1, t1 * (1 - t2), t2]; // [add, tx, dashboard]
+    }
+    const STAGE_RY = [0.18, 0.0, -0.18];       // rotation douce : add -> tx (face) -> dashboard
+    const S0 = 0.35;                            // part du scroll dédiée à l'étape 0 (chaos -> entrée). Section raccourcie -> morph 1->3 plus rapide
+
+    const HERO_RY = -0.42, HERO_RX = 0.12;     // orientation hero (écran vers le texte)
+    const ANIM_RY0 = STAGE_RY[0], ANIM_RX = 0.05; // départ animation = 1ère étape
+
+    let curX = 0, curY = 0, curS = 1, curRy = HERO_RY, curRx = HERO_RX;
+    let psx = 0, psy = 0;                       // pointeur lissé (parallaxe fluide des cartes)
+    let inited = false;
+    let t0 = performance.now();
+
+    function frame() {
+      const heroA = document.getElementById('phone-anchor-hero');
+      const scrollA = document.getElementById('pscroll-stage');
+      const sec = document.getElementById('pscroll');
+      if (!heroA || !scrollA || !sec) { renderer.render(scene, camera); return; }
+
+      const vh = window.innerHeight;
+      const secRect = sec.getBoundingClientRect();
+
+      // Visible uniquement tant que l'expérience (hero -> fin pscroll) est à l'écran
+      const active = secRect.bottom > 0;
+      host.style.opacity = active ? '1' : '0';
+      if (!active) { renderer.render(scene, camera); return; }
+
+      const hero = placeFromRect(heroA.getBoundingClientRect());
+      const scr = placeFromRect(scrollA.getBoundingClientRect());
+
+      const top = secRect.top;
+      const tr = clamp01(1 - top / vh);                 // 0 = hero, 1 = arrivé/épinglé
+      const pin = Math.max(0, secRect.height - vh);
+      const p = clamp01(-top / pin);                    // progression dans la section (0 en voyage)
+
+      // pointeur lissé (suivi doux pour une parallaxe fluide)
+      psx += (pointerX - psx) * (reduce ? 1 : 0.08);
+      psy += (pointerY - psy) * (reduce ? 1 : 0.08);
+
+      let tx = 0, ty = 0, sc = 1, ry = 0, rx = 0;
+      const op = [0, 0, 0, 0]; // [dashboard, add, tx, splash]
+      let capP = -1;
+
+      if (top > 0) {
+        // ── Voyage hero -> animation ──
+        const u = smooth(tr);
+        tx = lerp(hero.wx, scr.wx, u);
+        ty = lerp(hero.wy, scr.wy, u);
+        sc = lerp(hero.scale, scr.scale, u);
+        ry = lerp(HERO_RY, ANIM_RY0, u);
+        rx = lerp(HERO_RX, ANIM_RX, u);
+        op[DASH] = 1 - u;     // dashboard (hero) -> écran de chargement pendant le voyage
+        op[SPLASH] = u;
+      } else {
+        // ── Épinglé : étape 0 (chaos) puis morph par paliers ──
+        tx = scr.wx; ty = scr.wy; sc = scr.scale;
+
+        // p0 = progression de l'étape 0 ; pm = progression du morph (3 étapes)
+        const p0 = clamp01(p / S0);
+        const pm = clamp01((p - S0) / (1 - S0));
+        const morphReveal = smoothstep(S0 - 0.02, S0 + 0.05, p); // 0 pendant l'étape 0
+
+        const w = stageWeights(pm);                // [add, tx, dashboard]
+        const order = [ADD, TX, DASH];
+        ry = w[0] * STAGE_RY[0] + w[1] * STAGE_RY[1] + w[2] * STAGE_RY[2];
+        rx = ANIM_RX;
+        op[SPLASH] = 1 - morphReveal;              // chargement pendant l'étape 0, puis fond vers l'app
+        let best = 0, bestV = -1;
+        w.forEach((o, i) => {
+          op[order[i]] = o * morphReveal;
+          if (caps[i]) {
+            const co = o * morphReveal;
+            caps[i].style.opacity = String(co < 0.02 ? 0 : co);
+            caps[i].style.setProperty('--cap-shift', `${(1 - o) * 18}px`);
+          }
+          if (o > bestV) { bestV = o; best = i; }
+        });
+        dots.forEach((d, i) => d.classList.toggle('on', i === best && morphReveal > 0.5));
+        capP = best;
+      }
+
+      // ── Étape 0 : cartes éparpillées DANS le sticky (défilent avec la page, sous la maquette) ──
+      // Pas de pop : elles font partie du flux. Quand la maquette est en place (épinglé), elles rentrent.
+      const cardsWrap = document.getElementById('pscroll-cards');
+      const p0 = clamp01(p / S0);
+      if (cardsWrap && cards.length) {
+        const wrapRect = cardsWrap.getBoundingClientRect();
+        const cx = wrapRect.left + wrapRect.width / 2;   // centre conteneur (= centre maquette une fois épinglé)
+        const cy = wrapRect.top + wrapRect.height / 2;
+        const aRect = scrollA.getBoundingClientRect();
+        const targetOffX = (aRect.left + aRect.width / 2) - cx;  // décalage vers le centre de la maquette
+        const targetOffY = (aRect.top + aRect.height / 2) - cy;
+        cards.forEach((c, i) => {
+          // pseudo-aléatoire déterministe par carte -> trajectoires variées
+          const rnd = (s: number) => { const v = Math.sin((i + 1) * 97.13 + s * 41.7) * 43758.5; return v - Math.floor(v); };
+          const sx = +(c.dataset.x || 0) + (rnd(7) - 0.5) * 36;   // position éparpillée (offset depuis le centre)
+          const sy = +(c.dataset.y || 0) + (rnd(8) - 0.5) * 40;
+          const delay = rnd(1) * 0.4;                 // départ décalé (stream)
+          const rot0 = (rnd(2) - 0.5) * 0.6;          // rotation initiale (±17°)
+          const curveDir = rnd(3) < 0.5 ? -1 : 1;
+          const curveMag = 70 + rnd(4) * 170;         // amplitude de la courbe
+          const tjx = (rnd(5) - 0.5) * 90;            // point d'entrée varié dans la maquette
+          const tjy = (rnd(6) - 0.5) * 200;
+
+          const lp = clamp01((p0 - delay) / (1 - delay));
+          const e = smooth(lp);
+          const tgX = targetOffX + tjx, tgY = targetOffY + tjy;
+          // ligne droite + arc perpendiculaire (chemin courbé), en coordonnées conteneur
+          let x = lerp(sx, tgX, e), y = lerp(sy, tgY, e);
+          const dX = tgX - sx, dY = tgY - sy;
+          const len = Math.hypot(dX, dY) || 1;
+          const arc = curveDir * curveMag * Math.sin(Math.PI * e);
+          x += (-dY / len) * arc;
+          y += (dX / len) * arc;
+          // parallaxe souris : profondeur variée par carte, s'estompe quand la carte rentre
+          const depth = 0.55 + rnd(9) * 1.15;
+          const par = 1 - e;
+          x += psx * depth * 48 * par;
+          y += psy * depth * 38 * par;
+          const s = 1 - 0.86 * e;
+          const rot = rot0 * (1 - e);
+          c.style.opacity = String(1 - smoothstep(0.7, 1, lp));
+          c.style.transform =
+            `translate(-50%, -50%) translate(${x}px, ${y}px) rotate(${rot}rad) scale(${s})`;
+        });
+      }
+      if (intro) intro.style.opacity = String(1 - smoothstep(0.55, 0.96, p0));
+
+      // Pendant le voyage : légendes du morph masquées (les cartes sont gérées plus haut)
+      if (capP < 0) {
+        caps.forEach((c) => { c.style.opacity = '0'; });
+        dots.forEach((d) => d.classList.remove('on'));
+      }
+
+      // Parallaxe + flottement (surtout en mode hero)
+      const t = (performance.now() - t0) / 1000;
+      const idle = 1 - tr;
+      ry += pointerX * 0.22 * (0.6 + 0.4 * idle);
+      rx += -pointerY * 0.14 * (0.6 + 0.4 * idle);
+      ty += Math.sin(t * 0.9) * 0.05 * idle;
+
+      // Lissage (plus serré = mieux collé au scroll)
+      const k = reduce ? 1 : 0.32;
+      const kp = reduce ? 1 : 0.6;
+      curX += (tx - curX) * kp;
+      curY += (ty - curY) * kp;
+      curS += (sc - curS) * kp;
+      curRy += (ry - curRy) * k;
+      curRx += (rx - curRx) * k;
+
+      if (!inited) { curX = tx; curY = ty; curS = sc; curRy = ry; curRx = rx; inited = true; }
+
+      phone.position.set(curX, curY, 0);
+      phone.scale.setScalar(curS);
+      phone.rotation.set(curRx, curRy, 0);
+      screenMats[DASH].opacity = op[DASH];
+      screenMats[ADD].opacity = op[ADD];
+      screenMats[TX].opacity = op[TX];
+      screenMats[SPLASH].opacity = op[SPLASH];
+
+      renderer.render(scene, camera);
+    }
+
+    renderer.setAnimationLoop(frame);
+  }
+
+  document.addEventListener('DOMContentLoaded', initPhoneStage);
+  initPhoneStage();
+</script>

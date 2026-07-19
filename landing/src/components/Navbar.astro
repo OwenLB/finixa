@@ -1,0 +1,355 @@
+---
+import type { Translations } from '../i18n/translations';
+
+interface Props {
+  t: Translations['nav'];
+}
+
+const { t } = Astro.props;
+---
+
+<nav id="navbar" class="navbar">
+  <div class="container nav-inner">
+    <a href="/" class="nav-logo">
+      <svg class="logo-icon" width="20" height="21" viewBox="0 0 587 626" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M293.279 430.5L194.779 602C182.76 615.422 174.071 620.799 152.779 624H55.7787L5.77869 538C-2.19366 515.362 -2.69092 502.069 15.2787 475.5L108.779 312.5L9.77869 141C-1.59082 118.474 -3.52051 105.261 9.77869 79.5L55.7787 0.5H155.779C176.081 5.59723 184.819 11.4072 195.779 27L293.779 195.5L388.779 30.5C400.8 12.4626 409.952 5.6443 431.779 1H531.279L582.279 89.5C587.32 110.347 588.649 121.968 575.779 142L536.279 211L578.279 287C586.696 309.568 587.136 322.086 574.779 344L535.279 412L575.279 481.5C586.906 502.35 589.756 514.91 579.279 541L531.279 625H430.279C412.926 621.843 404.467 616.108 390.779 601.5L293.279 430.5ZM234.779 328L74.2787 609.5L159.279 609C171.617 606.088 175.704 602.62 180.779 595L284.779 415.5L234.779 328ZM284.279 211L234.779 296L73.2787 17H157.279C169.97 19.2539 174.872 23.0512 181.279 32.5L284.279 211ZM565.779 129L410.779 400L373.779 334C365.379 316.804 365.477 305.718 378.779 282L526.779 24.5L565.779 92C574.022 104.792 574.09 112.881 565.779 129ZM568.779 527.5L526.279 601.5L486.779 532.5C482.201 518.441 482.358 510.559 486.779 496.5L526.279 428L568.779 500C571.487 511.84 572.913 518.441 568.779 527.5Z"/>
+      </svg>
+      <span class="logo-text">Finixa</span>
+    </a>
+
+    <!-- Desktop links (left, near logo) -->
+    <div class="nav-links">
+      <div class="nav-sep" aria-hidden="true"></div>
+      {t.links.map(link => (
+        <a href={link.href} class="nav-link">{link.label}</a>
+      ))}
+    </div>
+
+    <!-- Desktop nav (right) -->
+    <div class="nav-right">
+      <a href={t.langSwitchPath} class="lang-toggle" aria-label={t.langSwitchLabel}>
+        {t.langSwitch}
+      </a>
+      <button id="theme-toggle" class="theme-toggle" aria-label="Changer le thème">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+        </svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+      <a href="https://app.finixa.net" class="btn-appstore nav-cta" aria-label={t.appStore} rel="noopener noreferrer" target="_blank">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M7 17L17 7M17 7H8M17 7v9"/>
+        </svg>
+        {t.appStore}
+      </a>
+    </div>
+
+    <!-- Mobile controls -->
+    <div class="nav-mobile">
+      <button id="theme-toggle-mobile" class="theme-toggle" aria-label="Changer le thème">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+        </svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+      <button id="burger-btn" class="burger" aria-label="Menu" aria-expanded="false">
+        <svg class="burger-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M3 6h18M3 12h18M3 18h18"/>
+        </svg>
+        <svg class="burger-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M18 6 6 18M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile menu panel -->
+  <div id="nav-panel" class="nav-panel" aria-hidden="true">
+    {t.links.map(link => (
+      <a href={link.href} class="panel-link">{link.label}</a>
+    ))}
+    <a href={t.langSwitchPath} class="panel-lang" aria-label={t.langSwitchLabel}>
+      {t.langSwitch} — {t.langSwitchLabel}
+    </a>
+    <a href="https://app.finixa.net" class="btn-appstore panel-cta" rel="noopener noreferrer" target="_blank">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+      </svg>
+      {t.appStore}
+    </a>
+  </div>
+</nav>
+
+<style>
+  @keyframes navSlideDown {
+    from { transform: translateY(-100%); opacity: 0; }
+    to   { transform: translateY(0);     opacity: 1; }
+  }
+
+  .navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    padding: 14px 0;
+    background: var(--bg-glass);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    transition: background 0.3s ease, border-color 0.3s ease;
+    animation: navSlideDown 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .nav-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo-icon { fill: var(--text); flex-shrink: 0; }
+
+  .logo-text {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--text);
+  }
+
+  /* Desktop anchor links — collés au logo (gauche) */
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    margin-right: auto; /* pousse les contrôles droite vers la droite */
+  }
+
+  .nav-sep {
+    width: 1px;
+    height: 18px;
+    background: var(--border);
+    margin: 0 10px;
+    flex-shrink: 0;
+  }
+
+  .nav-link {
+    height: 34px;
+    padding: 0 10px;
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+    border-radius: var(--radius-sm);
+    transition: color var(--transition), background var(--transition);
+  }
+
+  .nav-link:hover {
+    color: var(--text);
+    background: var(--surface);
+  }
+
+  /* Desktop nav-right */
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* Language toggle */
+  .lang-toggle {
+    height: 36px;
+    padding: 0 12px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    transition: color var(--transition), border-color var(--transition);
+  }
+
+  .lang-toggle:hover {
+    color: var(--text);
+    border-color: var(--border-hover);
+  }
+
+  /* Theme toggle */
+  .theme-toggle {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    transition: color var(--transition), border-color var(--transition), background var(--transition);
+  }
+
+  .theme-toggle:hover {
+    color: var(--text);
+    border-color: var(--border-hover);
+  }
+
+  .theme-toggle svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+
+  .icon-sun { display: none; }
+  .icon-moon { display: block; }
+
+  :global([data-theme="dark"]) .icon-sun { display: block; }
+  :global([data-theme="dark"]) .icon-moon { display: none; }
+
+  .nav-cta {
+    font-size: 13px;
+    padding: 9px 18px;
+  }
+
+  /* ── Mobile controls (hidden on desktop) ── */
+  .nav-mobile {
+    display: none;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .burger {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    transition: color var(--transition), border-color var(--transition);
+  }
+
+  .burger:hover { color: var(--text); border-color: var(--border-hover); }
+  .burger svg { width: 18px; height: 18px; }
+  .burger-close { display: none; }
+
+  .navbar.menu-open .burger-open  { display: none; }
+  .navbar.menu-open .burger-close { display: block; }
+
+  /* ── Mobile menu panel ── */
+  .nav-panel {
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 20px 16px;
+    border-top: 1px solid var(--border);
+    background: var(--bg-glass);
+  }
+
+  .navbar.menu-open .nav-panel { display: flex; }
+
+  .panel-link {
+    padding: 12px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    text-align: center;
+    transition: color var(--transition), background var(--transition);
+  }
+
+  .panel-link:hover { background: var(--surface); }
+
+  .panel-lang {
+    padding: 12px 16px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-align: center;
+    transition: color var(--transition);
+  }
+
+  .panel-lang:hover { color: var(--text); }
+
+  .panel-cta {
+    font-size: 14px;
+    padding: 12px 18px;
+    justify-content: center;
+  }
+
+  /* ── Breakpoint ── */
+  @media (max-width: 580px) {
+    .nav-right  { display: none; }
+    .nav-links  { display: none; }
+    .nav-mobile { display: flex; }
+  }
+</style>
+
+<script>
+  // ── Theme toggle (both desktop and mobile buttons) ──
+  function getTheme(): 'dark' | 'light' {
+    const stored = localStorage.getItem('theme');
+    if (stored === 'dark' || stored === 'light') return stored;
+    return 'light'; // light par défaut
+  }
+
+  function applyTheme(theme: 'dark' | 'light') {
+    if (theme === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+    }
+    localStorage.setItem('theme', theme);
+  }
+
+  const themeToggles = [
+    document.getElementById('theme-toggle'),
+    document.getElementById('theme-toggle-mobile'),
+  ];
+
+  themeToggles.forEach((btn) => {
+    btn?.addEventListener('click', () => {
+      applyTheme(getTheme() === 'dark' ? 'light' : 'dark');
+    });
+  });
+
+  // ── Burger menu ──
+  const burger = document.getElementById('burger-btn');
+  const navbar = document.getElementById('navbar');
+
+  burger?.addEventListener('click', () => {
+    const isOpen = navbar?.classList.toggle('menu-open');
+    burger.setAttribute('aria-expanded', String(isOpen));
+  });
+
+  // Close on outside click or anchor link click
+  document.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    const isAnchor = target.closest('.panel-link');
+    if (navbar?.classList.contains('menu-open') && (!navbar.contains(target) || isAnchor)) {
+      navbar.classList.remove('menu-open');
+      burger?.setAttribute('aria-expanded', 'false');
+    }
+  });
+</script>

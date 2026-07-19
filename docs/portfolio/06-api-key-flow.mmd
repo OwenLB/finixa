@@ -1,0 +1,11 @@
+sequenceDiagram
+    participant SC as iOS Shortcuts
+    participant EF as Edge Function (Deno)
+    participant DB as PostgreSQL RLS
+
+    SC->>EF: POST /add-transaction\nAuthorization: Bearer api_key
+    EF->>DB: SELECT user_id FROM user_api_keys\nWHERE key_hash = SHA256(api_key)
+    DB-->>EF: user_id trouvé
+    EF->>DB: INSERT INTO transactions\n(user_id, name, amount, ...)
+    DB-->>EF: Transaction créée
+    EF-->>SC: 200 OK

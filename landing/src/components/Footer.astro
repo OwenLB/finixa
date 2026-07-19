@@ -1,0 +1,146 @@
+---
+import type { Translations } from '../i18n/translations';
+
+interface Props {
+  t: Translations['footer'];
+}
+
+const { t } = Astro.props;
+---
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="/" class="footer-logo">
+          <svg class="footer-logo-icon" width="22" height="23" viewBox="0 0 587 626" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M293.279 430.5L194.779 602C182.76 615.422 174.071 620.799 152.779 624H55.7787L5.77869 538C-2.19366 515.362 -2.69092 502.069 15.2787 475.5L108.779 312.5L9.77869 141C-1.59082 118.474 -3.52051 105.261 9.77869 79.5L55.7787 0.5H155.779C176.081 5.59723 184.819 11.4072 195.779 27L293.779 195.5L388.779 30.5C400.8 12.4626 409.952 5.6443 431.779 1H531.279L582.279 89.5C587.32 110.347 588.649 121.968 575.779 142L536.279 211L578.279 287C586.696 309.568 587.136 322.086 574.779 344L535.279 412L575.279 481.5C586.906 502.35 589.756 514.91 579.279 541L531.279 625H430.279C412.926 621.843 404.467 616.108 390.779 601.5L293.279 430.5ZM234.779 328L74.2787 609.5L159.279 609C171.617 606.088 175.704 602.62 180.779 595L284.779 415.5L234.779 328ZM284.279 211L234.779 296L73.2787 17H157.279C169.97 19.2539 174.872 23.0512 181.279 32.5L284.279 211ZM565.779 129L410.779 400L373.779 334C365.379 316.804 365.477 305.718 378.779 282L526.779 24.5L565.779 92C574.022 104.792 574.09 112.881 565.779 129ZM568.779 527.5L526.279 601.5L486.779 532.5C482.201 518.441 482.358 510.559 486.779 496.5L526.279 428L568.779 500C571.487 511.84 572.913 518.441 568.779 527.5Z"/>
+          </svg>
+          <span>Finixa</span>
+        </a>
+        <p class="footer-tagline">{t.tagline}</p>
+      </div>
+
+      <div class="footer-links-group">
+        <div class="footer-col">
+          <span class="footer-col-title">{t.legalTitle}</span>
+          <a href={t.privacyHref}>{t.privacy}</a>
+          <a href={t.termsHref}>{t.terms}</a>
+          <a href="mailto:contact@finixa.app">{t.contact}</a>
+        </div>
+
+        <div class="footer-col">
+          <span class="footer-col-title">{t.socialTitle}</span>
+          <a href="https://github.com/OwenLB" target="_blank" rel="noopener noreferrer">GitHub</a>
+          <a href="https://www.linkedin.com/in/owenlb/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+          <a href="https://owenlebec.fr/" target="_blank" rel="noopener noreferrer">Portfolio</a>
+          <a href="mailto:lebec.owen@yahoo.fr">Email</a>
+        </div>
+
+        <div class="footer-col">
+          <span class="footer-col-title">{t.appTitle}</span>
+          <a href="https://app.finixa.net" target="_blank" rel="noopener noreferrer">Ouvrir l'app</a>
+          <a href="#faq">FAQ</a>
+          <a href="#pricing">Pricing</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Wordmark géant -->
+    <div class="footer-wordmark" aria-hidden="true">Finixa</div>
+
+    <div class="footer-bottom">
+      <span class="footer-copy">
+        &copy; {new Date().getFullYear()} Finixa. {t.copy}
+      </span>
+      <div class="footer-badges">
+        <span class="footer-badge">Web</span>
+        <span class="footer-badge">Privacy-first</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<style>
+  /* Le footer est la seule zone sombre — contraste fort, façon Airform */
+  .footer {
+    background: #0a0a0a;
+    color: #f4f4f0;
+    padding: 96px 0 40px;
+    margin-top: 80px;
+    overflow: hidden;
+  }
+
+  .footer-top {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 64px;
+    margin-bottom: 64px;
+  }
+
+  .footer-brand { display: flex; flex-direction: column; gap: 14px; }
+
+  .footer-logo { display: flex; align-items: center; gap: 10px; }
+  .footer-logo-icon { fill: #f4f4f0; flex-shrink: 0; }
+
+  .footer-logo span { font-size: 18px; font-weight: 600; letter-spacing: -0.03em; color: #f4f4f0; }
+  .footer-tagline   { font-size: 14px; color: rgba(244,244,240,0.55); max-width: 32ch; }
+
+  .footer-links-group { display: flex; gap: 56px; }
+
+  .footer-col { display: flex; flex-direction: column; gap: 12px; }
+
+  .footer-col-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(244,244,240,0.4);
+    margin-bottom: 4px;
+  }
+
+  .footer-col a { font-size: 13px; color: rgba(244,244,240,0.65); transition: color var(--transition); }
+  .footer-col a:hover { color: #f4f4f0; }
+
+  /* Wordmark géant en bas */
+  .footer-wordmark {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.05em;
+    font-size: clamp(80px, 22vw, 340px);
+    line-height: 0.8;
+    color: rgba(244,244,240,0.05);
+    text-align: center;
+    margin: 24px 0 40px;
+    user-select: none;
+  }
+
+  .footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 28px;
+    border-top: 1px solid rgba(244,244,240,0.1);
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .footer-copy { font-size: 12px; color: rgba(244,244,240,0.4); }
+
+  .footer-badges { display: flex; gap: 8px; }
+
+  .footer-badge {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    padding: 4px 10px;
+    border: 1px solid rgba(244,244,240,0.15);
+    border-radius: 100px;
+    color: rgba(244,244,240,0.55);
+  }
+
+  @media (max-width: 760px) {
+    .footer-top { grid-template-columns: 1fr; gap: 40px; }
+    .footer-links-group { flex-wrap: wrap; gap: 32px; }
+  }
+</style>

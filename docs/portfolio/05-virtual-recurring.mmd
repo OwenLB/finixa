@@ -1,0 +1,16 @@
+flowchart LR
+    subgraph DEF ["Définition récurrente"]
+        D["start_date · frequency\nday_of_month · accounting_offset"]
+    end
+
+    subgraph CALC ["Calcul client — virtualTransactions.ts"]
+        C1["getDatesInRange()\nItère les périodes du mois\nClamping jour-du-mois\nex: 31 fév → 28"]
+        C2["getOccurrenceKey()\nMensuel   → YYYY-MM\nHebdo     → YYYY-W##\nTrimestr  → YYYY-Q#\nAnnuel    → YYYY"]
+    end
+
+    subgraph DISPLAY ["Affichage & persistance"]
+        V["Transaction virtuelle\nnon persistée\naffichée dans la liste"]
+        M["Utilisateur coche\ninsertMaterializedTransaction()\n→ persistée + recurrence_occurrence"]
+    end
+
+    D --> C1 --> C2 --> V --> M

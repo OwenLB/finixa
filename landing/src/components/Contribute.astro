@@ -1,0 +1,130 @@
+---
+import type { Translations } from '../i18n/translations';
+import Icon from './Icon.astro';
+
+interface Props {
+  t: Translations['contribute'];
+}
+
+const { t } = Astro.props;
+---
+
+<section class="section contribute-section">
+  <div class="container">
+    <div class="section-label">{t.sectionLabel}</div>
+
+    <h2 class="contribute-title reveal-up">
+      {t.title}
+    </h2>
+    <p class="contribute-sub">{t.subtitle}</p>
+
+    <div class="contribute-grid">
+
+      <!-- Bug -->
+      <a href={`mailto:${t.email}?subject=${encodeURIComponent(t.bug.subject)}`} class="contribute-card">
+        <div class="cc-icon"><Icon name="bug" size={26} /></div>
+        <div class="cc-body">
+          <h3 class="cc-title">{t.bug.title}</h3>
+          <p class="cc-desc">{t.bug.desc}</p>
+        </div>
+        <div class="cc-cta">{t.bug.cta} →</div>
+      </a>
+
+      <!-- Feature -->
+      <a href={`mailto:${t.email}?subject=${encodeURIComponent(t.feature.subject)}`} class="contribute-card">
+        <div class="cc-icon"><Icon name="lightbulb" size={26} /></div>
+        <div class="cc-body">
+          <h3 class="cc-title">{t.feature.title}</h3>
+          <p class="cc-desc">{t.feature.desc}</p>
+        </div>
+        <div class="cc-cta">{t.feature.cta} →</div>
+      </a>
+
+      <!-- PR -->
+      <a href="https://github.com/OwenLB" target="_blank" rel="noopener noreferrer" class="contribute-card contribute-card-pr">
+        <div class="cc-icon"><Icon name="code" size={26} /></div>
+        <div class="cc-body">
+          <h3 class="cc-title">{t.pr.title}</h3>
+          <p class="cc-desc">{t.pr.desc}</p>
+        </div>
+        <div class="cc-cta">{t.pr.cta} →</div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<style>
+  .contribute-title {
+    font-size: clamp(28px, 3.5vw, 44px);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1.15;
+    margin-bottom: 12px;
+  }
+
+  .contribute-sub {
+    font-size: 15px;
+    color: var(--text-muted);
+    margin-bottom: 48px;
+    line-height: 1.6;
+  }
+
+  .contribute-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  .contribute-card {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 28px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    transition: border-color var(--transition), transform var(--transition);
+    text-decoration: none;
+  }
+
+  .contribute-card:hover {
+    border-color: var(--border-hover);
+    transform: translateY(-2px);
+  }
+
+  .contribute-card-pr {
+    background: var(--surface);
+  }
+
+  .cc-icon {
+    font-size: 28px;
+    line-height: 1;
+  }
+
+  .cc-body { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+
+  .cc-title {
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+
+  .cc-desc {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.55;
+  }
+
+  .cc-cta {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-top: 4px;
+  }
+
+  @media (max-width: 720px) {
+    .contribute-grid { grid-template-columns: 1fr; }
+  }
+</style>

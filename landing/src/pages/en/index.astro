@@ -1,0 +1,60 @@
+---
+import { en as t } from '../../i18n/translations';
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import Hero from '../../components/Hero.astro';
+import PhoneStage3D from '../../components/PhoneStage3D.astro';
+import PhoneScroll3D from '../../components/PhoneScroll3D.astro';
+import CTAMid from '../../components/CTAMid.astro';
+import ProblemSolution from '../../components/ProblemSolution.astro';
+import BentoGrid from '../../components/BentoGrid.astro';
+import Testimonials from '../../components/Testimonials.astro';
+import Pricing from '../../components/Pricing.astro';
+import Creator from '../../components/Creator.astro';
+import FAQ from '../../components/FAQ.astro';
+import Contribute from '../../components/Contribute.astro';
+import Footer from '../../components/Footer.astro';
+---
+
+<Layout lang={t.meta.lang} title={t.meta.title} description={t.meta.description}>
+  <Navbar t={t.nav} />
+  <PhoneStage3D />
+  <main>
+    <Hero t={t.hero} mockup={t.mockup} />
+    <PhoneScroll3D
+      steps={[
+        { eyebrow: '01 — Capture', title: 'Add an expense<br />in 5 seconds.', sub: 'Big amount, instant keypad. Even at the till.' },
+        { eyebrow: '02 — Organize', title: 'Everything sorts<br />itself out.', sub: 'Categorized, cleared, under control — effortlessly.' },
+        { eyebrow: '03 — Understand', title: 'And you see it all,<br />at a glance.', sub: 'Budget by category, 50/30/20, to the cent.' },
+      ]}
+      intro={{
+        eyebrow: '00 — Scattered',
+        title: 'Your spending,<br />everywhere.',
+        sub: 'Finixa captures it and puts it all back in order.',
+      }}
+      cards={[
+        { ic: 'utensils', name: 'Restaurant', amt: '-€12.90' },
+        { ic: 'dumbbell', name: 'Gym', amt: '-€29.90' },
+        { ic: 'cart', name: 'Groceries', amt: '-€32.40' },
+        { ic: 'smartphone', name: 'Subscription', amt: '-€9.99' },
+        { ic: 'clapperboard', name: 'Cinema', amt: '-€11.00' },
+        { ic: 'package', name: 'Amazon', amt: '-€24.90' },
+        { ic: 'pill', name: 'Pharmacy', amt: '-€8.40' },
+        { ic: 'zap', name: 'Energy', amt: '-€56.00' },
+        { ic: 'train', name: 'Transport', amt: '-€2.10' },
+        { ic: 'home', name: 'Rent', amt: '-€710' },
+        { ic: 'coffee', name: 'Coffee', amt: '-€3.50' },
+        { ic: 'fuel', name: 'Fuel', amt: '-€45.00' },
+      ]}
+    />
+    <CTAMid t={t.ctaMid} />
+    <ProblemSolution t={t.problemSolution} />
+    <BentoGrid t={t.bento} />
+    <Testimonials t={t.testimonials} />
+    <Pricing t={t.pricing} />
+    <Creator t={t.creator} />
+    <FAQ t={t.faq} />
+    <Contribute t={t.contribute} />
+  </main>
+  <Footer t={t.footer} />
+</Layout>

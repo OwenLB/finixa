@@ -1,0 +1,103 @@
+---
+import type { Translations } from '../i18n/translations';
+
+interface Props {
+  t: Translations['faq'];
+}
+
+const { t } = Astro.props;
+---
+
+<section class="section faq" id="faq">
+  <div class="container">
+    <div class="section-label">{t.sectionLabel}</div>
+
+    <h2 class="faq-title reveal-up">
+      {t.titleBefore} <span class="pencil-mark">{t.titleAccent}</span>
+    </h2>
+
+    <div class="faq-list">
+      {t.items.map((item, i) => (
+        <details class="faq-item" open={i === 0}>
+          <summary class="faq-q">{item.q}</summary>
+          <div class="faq-a"><p>{item.a}</p></div>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .faq-title {
+    font-size: clamp(32px, 4vw, 52px);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+    margin-bottom: 48px;
+  }
+
+  .faq-list { display: flex; flex-direction: column; gap: 0; }
+
+  .faq-item {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .faq-item:first-child { border-top: 1px solid var(--border); }
+
+  .faq-q {
+    padding: 20px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    letter-spacing: -0.01em;
+    transition: color var(--transition);
+  }
+
+  .faq-q::-webkit-details-marker { display: none; }
+
+  .faq-q::after {
+    content: '+';
+    font-size: 20px;
+    font-weight: 300;
+    color: var(--text-muted);
+    flex-shrink: 0;
+    transition: transform 0.25s ease, color var(--transition);
+  }
+
+  details[open] .faq-q::after {
+    transform: rotate(45deg);
+    color: var(--text);
+  }
+
+  .faq-q:hover { color: var(--text); }
+
+  .faq-a {
+    padding-bottom: 20px;
+    overflow: hidden;
+  }
+
+  .faq-a p {
+    font-size: 15px;
+    line-height: 1.75;
+    color: var(--text-muted);
+  }
+</style>
+
+<script type="application/ld+json" set:html={JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": t.items.map(item => ({
+    "@type": "Question",
+    "name": item.q,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": item.a
+    }
+  }))
+})} />

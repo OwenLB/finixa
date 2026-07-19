@@ -1,0 +1,11 @@
+flowchart LR
+    subgraph STD ["Mode standard — accounting_offset: same_month"]
+        A1["Prélèvement le 15 janv."] --> B1["date = 2026-01-15\naccounting_date = null"]
+        B1 --> C1["Imputé sur : Janvier"]
+    end
+
+    subgraph DEC ["Mode décalé — accounting_offset: next_month"]
+        A2["Prélèvement récurrent\nle 28 janv."] --> B2["date = 2026-01-28"]
+        B2 --> C2["À la matérialisation :\naccounting_date = 2026-02-01"]
+        C2 --> D2["Imputé sur : Février"]
+    end

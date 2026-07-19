@@ -1,0 +1,55 @@
+flowchart TD
+    subgraph MOBILE ["Mobile — Capacitor 8"]
+        IOS["iOS App\n(nuxt generate → cap sync → Xcode)"]
+        PREF["@capacitor/preferences\nPIN · thème · état onboarding"]
+    end
+
+    subgraph CLIENT ["Client — Nuxt 4 · Vue 3 · TypeScript · SPA · hash routing"]
+        PAGES["Pages 13\ndashboard · transactions · add · budget\nmore · login · register · onboarding · confirm · ..."]
+        COMPONENTS["Composants 107\nadd/ · categories/ · dashboard/ · transactions/\nui/ · favorites/ · recurring/ · savings/ · categorization/"]
+        COMPOSABLES["Composables 17\nuseRecurringActions · useCategorizationQueue\nuseInsightData · useAppLock · useTheme\nuseCsvImport · usePullToRefresh · useKeyboardShortcuts · ..."]
+        STORES_D["Pinia — Stores données\nuseTransactionStore · useCategoryStore\nuseRecurringStore · useFavoriteStore\nuseEnvelopeStore · useSavingsGoalStore\nuseCategoryStatsStore · useDashboardStore"]
+        STORES_UI["Pinia — Stores UI\nusePreferencesStore · usePeriodStore\nuseFilterStore · useSelectionStore\nuseBiometricStore · useCurrencyStore"]
+        SERVICES["Services 10\ntransactionService · categoryService · recurringService\ncategoryStatsService · dashboardService\npreferenceService · envelopeService · favoriteService · ..."]
+        UTILS["Utils 14\nvirtualTransactions · groupByDate · period\nformatCurrency · csvParser · categoryIcon · ..."]
+        I18N["i18n — FR + EN\n~20 KB chacun"]
+        SCSS_TK["SCSS tokens\nauto-injectés via additionalData"]
+    end
+
+    subgraph NUXT_API ["Nuxt Server API"]
+        APIKEY_RT["/api/api-key\nstatus · generate · revoke"]
+    end
+
+    subgraph SUPABASE ["Supabase"]
+        SB_AUTH["Auth\nJWT · cookie 30j · key: finixa-auth\nredirect → /login · /confirm"]
+        SB_DB[("PostgreSQL + RLS\ntransactions · categories · subcategories\nrecurring_transactions · user_preferences\nbudget_envelopes · savings_goals · favorites\npush_subscriptions · user_api_keys")]
+        SB_RPC["RPCs PostgreSQL\nget_dashboard_month · get_subcategory_stats\nget_category_spent · get_variable_daily_remaining\nrecurring_virtual_for_month · get_envelope_stats · ..."]
+        SB_EF["Edge Functions — Deno\nadd-transaction · user-categories\ndaily-digest · test-notification"]
+    end
+
+    subgraph EXTERN ["Intégrations externes"]
+        EXT_SC["iOS Shortcuts / Webhooks\nAPI Key SHA-256"]
+        EXT_PUSH["Web Push API"]
+        EXT_CSV["Import CSV — PapaParse\nclient-side uniquement"]
+    end
+
+    PAGES --> COMPONENTS
+    PAGES --> COMPOSABLES
+    COMPONENTS --> STORES_D
+    COMPONENTS --> STORES_UI
+    COMPOSABLES --> STORES_D
+    COMPOSABLES --> STORES_UI
+    STORES_D --> SERVICES
+    STORES_UI --> SERVICES
+    STORES_D --> UTILS
+    SERVICES --> SB_AUTH
+    SERVICES --> SB_DB
+    SERVICES --> SB_RPC
+    SB_DB <--> SB_RPC
+    EXT_SC --> SB_EF
+    EXT_PUSH --> SB_EF
+    SB_EF --> SB_DB
+    EXT_CSV --> STORES_D
+    CLIENT --> MOBILE
+    MOBILE --> PREF
+    APIKEY_RT --> SB_DB
